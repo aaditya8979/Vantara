@@ -20,7 +20,21 @@ from _anomaly_engine import run_anomaly_engine
 
 # ─── Initialize ──────────────────────────────────────────────────────
 
-app = FastAPI(title="VANTARA API", version="1.0.0")
+tags_metadata = [
+    {"name": "System", "description": "System health and status checks."},
+    {"name": "Dashboard", "description": "Aggregate metrics for high-level monitoring."},
+    {"name": "Claims", "description": "Core CRUD operations for FRA land claims."},
+    {"name": "Reference", "description": "Geospatial and administrative boundary data."},
+    {"name": "Officer Actions", "description": "Role-specific queues and legal directives."},
+    {"name": "AI Summaries", "description": "AI-generated narratives for complex claims."},
+]
+
+app = FastAPI(
+    title="VANTARA API",
+    description="Operational intelligence engine for the Forest Rights Act (FRA), 2006.",
+    version="1.0.0",
+    openapi_tags=tags_metadata
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -87,6 +101,17 @@ async def ensure_data_loaded(request: Request, call_next):
     return response
 
 
+# ─── System Endpoints ────────────────────────────────────────────────
+
+@app.get("/api/health", tags=["System"])
+def health_check():
+    """Returns the operational status of the API and data engine."""
+    return {
+        "status": "healthy",
+        "data_loaded": _DATA_LOADED,
+        "claims_indexed": len(CLAIMS_INDEX)
+    }
+
 # ─── Pydantic Models ─────────────────────────────────────────────────
 
 class OfficerActionRequest(BaseModel):
@@ -106,7 +131,7 @@ class OfficerActionResponse(BaseModel):
 
 # ─── Dashboard Endpoints ─────────────────────────────────────────────
 
-@app.get("/api/dashboard/summary")
+@app.get("/api/dashboard/summary", tags=["Dashboard"])
 def dashboard_summary(district: Optional[str] = None, state: Optional[str] = None):
     """Aggregate counts across all claims or filtered by district/state."""
     filtered = CLAIMS
@@ -170,7 +195,7 @@ def dashboard_summary(district: Optional[str] = None, state: Optional[str] = Non
 
 # ─── Claims Endpoints ────────────────────────────────────────────────
 
-@app.get("/api/claims")
+@app.get("/api/claims", tags=["Claims"])
 def get_claims(
     status: Optional[str] = None,
     district: Optional[str] = None,
@@ -233,7 +258,7 @@ def get_claims(
     }
 
 
-@app.get("/api/claims/{claim_id}")
+@app.get("/api/claims/{claim_id}", tags=["Claims"])
 def get_claim_detail(claim_id: str):
     """Return full claim payload including stage history and anomaly flags."""
     claim = CLAIMS_INDEX.get(claim_id)
@@ -244,7 +269,7 @@ def get_claim_detail(claim_id: str):
 
 # ─── Officer Actions ─────────────────────────────────────────────────
 
-@app.post("/api/claims/{claim_id}/actions")
+@app.post("/api/claims/{claim_id}/actions", tags=["Claims"])
 def add_officer_action(claim_id: str, action: OfficerActionRequest):
     """Append an officer action to a claim's audit trail."""
     claim = CLAIMS_INDEX.get(claim_id)
@@ -271,7 +296,7 @@ def add_officer_action(claim_id: str, action: OfficerActionRequest):
 
 # ─── GeoJSON Endpoint ────────────────────────────────────────────────
 
-@app.get("/api/geojson/districts")
+@app.get("/api/geojson/districts", tags=["Reference"])
 def get_district_geojson():
     """
     Return district data as GeoJSON FeatureCollection.
@@ -318,13 +343,13 @@ def get_district_geojson():
 
 # ─── District Detail ─────────────────────────────────────────────────
 
-@app.get("/api/districts")
+@app.get("/api/districts", tags=["Reference"])
 def get_all_districts():
     """Return all district summaries with anomaly scores."""
     return DISTRICTS
 
 
-@app.get("/api/districts/{district_name}")
+@app.get("/api/districts/{district_name}", tags=["Reference"])
 def get_district_detail(district_name: str):
     """Return a single district's full summary."""
     for ds in DISTRICTS:
@@ -335,7 +360,7 @@ def get_district_detail(district_name: str):
 
 # ─── State Aggregation ───────────────────────────────────────────────
 
-@app.get("/api/states")
+@app.get("/api/states", tags=["Reference"])
 def get_states():
     """Return state-level aggregated data."""
     state_map: dict[str, dict] = {}
@@ -372,7 +397,7 @@ def get_states():
 
 # ─── Applicant Portal ────────────────────────────────────────────────
 
-@app.get("/api/applicant/{claim_id}")
+@app.get("/api/applicant/{claim_id}", tags=["Claims"])
 def get_applicant_view(claim_id: str):
     """
     Public-safe view for applicants.
@@ -416,7 +441,7 @@ def get_applicant_view(claim_id: str):
 
 # ─── AI Summary Endpoint ─────────────────────────────────────────────
 
-@app.get("/api/ai/claim-summary/{claim_id}")
+@app.get("/api/ai/claim-summary/{claim_id}", tags=["AI Summaries"])
 def get_ai_claim_summary(claim_id: str):
     """
     Generate a deterministic plain-English summary of a claim's anomalies.
@@ -466,7 +491,7 @@ def get_ai_claim_summary(claim_id: str):
     }
 
 
-@app.get("/api/ai/district-summary/{district_name}")
+@app.get("/api/ai/district-summary/{district_name}", tags=["AI Summaries"])
 def get_ai_district_summary(district_name: str):
     """Generate a deterministic plain-English summary of a district's FRA status."""
     district = next((d for d in DISTRICTS if d["district"] == district_name), None)
@@ -521,7 +546,7 @@ def get_ai_district_summary(district_name: str):
 
 # ─── Role-Specific Endpoints ─────────────────────────────────────────
 
-@app.get("/api/sdlc/queue")
+@app.get("/api/sdlc/queue", tags=["Officer Actions"])
 def get_sdlc_queue(
     type: str = Query("incomplete"),
     district: Optional[str] = None,
@@ -598,7 +623,7 @@ def get_sdlc_queue(
     }
 
 
-@app.get("/api/dlc/violations")
+@app.get("/api/dlc/violations", tags=["Officer Actions"])
 def get_dlc_violations(
     district: Optional[str] = None,
     violation_type: Optional[str] = None,
@@ -686,7 +711,7 @@ def get_dlc_violations(
     }
 
 
-@app.get("/api/state/matrix")
+@app.get("/api/state/matrix", tags=["Dashboard"])
 def get_state_matrix(state: Optional[str] = None):
     """State Tribal Secretary — district matrix with capacity data."""
     target_districts = DISTRICTS

@@ -7,10 +7,37 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 VANTARA is an operational intelligence platform designed for government officials to monitor, enforce, and clear bottlenecks in the implementation of the **Forest Rights Act (FRA), 2006**. 
 
 Built with strict adherence to Indian Government (NIC) digital standards, VANTARA moves beyond simple dashboards to provide an **asymmetric, role-based resolution engine** tailored to the specific legal powers of different government tiers.
+
+## 🚀 Live Demo
+> **[View the Live Deployment on Vercel](https://vantara-nakshatra.vercel.app/)**
+
+---
+
+## 🏗️ Architecture
+
+VANTARA operates as a decoupled architecture powered by FastAPI on Vercel Serverless Functions and a React Single Page Application (SPA).
+
+```mermaid
+graph TD
+    User([Government Official]) --> |HTTPS| Frontend[React SPA / Vite]
+    Frontend --> |REST API| API[FastAPI / Vercel Serverless]
+    
+    subgraph "Vercel Serverless Backend"
+        API --> |Reads| Index[index.py / Endpoints]
+        Index --> |Generates in-memory| DataGen[_data_generator.py]
+        DataGen --> |Synthesizes| MockData[(In-Memory Dataset)]
+        Index --> |Detects Bottlenecks| AnomalyEngine[_anomaly_engine.py]
+    end
+```
+
+For more detailed technical documentation, see the [Architecture Guide](docs/ARCHITECTURE.md).
+
+---
 
 ## ✨ Core Features: Asymmetric Role-Based Architecture
 
@@ -25,30 +52,45 @@ Rather than showing the same generic data to everyone, VANTARA provides speciali
 ### 2. District Magistrate / DLC (Legal Enforcement)
 *Focus: Enforcing statutory deadlines and resolving structural land conflicts.*
 - **Geospatial Tracking**: Dedicated Leaflet map locked to the district, highlighting hotspots of statutory violations and land mismatches.
-- **Priority Action Queue**: Identifies claims stuck beyond the 60-day statutory limit or facing severe land area discrepancies (e.g., Mining Lease overlaps).
-- **One-Click Legal Directives**: Auto-generates official, printable **Rule 12(2) Compliance Mandates** and **Joint Cadastral Inspection Orders**.
+- **Priority Action Queue**: Identifies claims stuck beyond the 60-day statutory limit or facing severe land area discrepancies.
+- **One-Click Legal Directives**: Auto-generates official, printable **Rule 12(2) Compliance Mandates**.
 
 ### 3. State Tribal Secretary (Resource Allocation)
 *Focus: Macro-strategy, capacity building, and identifying systemic failures.*
-- **District Performance Matrix**: Ranks districts not just by pending claims, but by an AI-driven **Anomaly Score** identifying systemic vs. individual bottlenecks.
-- **SDLC Clearance Calculator**: A dynamic tool where the Secretary sets a "Target Clearance" timeline (e.g., 6 months). The system mathematically outputs the required claims-processed-per-month rate and prescribes the exact number of Special SDLC Sittings needed to clear the backlog.
+- **District Performance Matrix**: Ranks districts not just by pending claims, but by an AI-driven **Anomaly Score**.
+- **SDLC Clearance Calculator**: A dynamic tool where the Secretary sets a "Target Clearance" timeline to calculate required processing rates.
 
 ---
 
-## 🔬 Realistic Synthetic Data Engine
+## 📁 Project Structure
 
-VANTARA is powered by a highly sophisticated Python data generator that accurately models the grim realities of bureaucratic stagnation:
-- **Bimodal Variance**: Simulates real-world delays where some claims pass in 40 days, while others in systemic failure districts (e.g., Khunti, Pakur) are stuck for 1,000+ days.
-- **Root Cause Tagging**: Land mismatches aren't just flagged; they are dynamically assigned structural root causes (*"85% polygon overlap with active Mining Lease"* or *"Conflict with Reserved Forest Block"*) versus administrative errors (*"Missing Patwari validation"*).
-- **Geospatial Correlation**: 12,000+ synthetic claims are intelligently mapped to 30 real districts across 6 states based on actual Ministry of Tribal Affairs (MoTA) tribal population demographics.
+```
+├── api/                        # FastAPI serverless backend (Vercel)
+│   ├── index.py                # Main API entry point & Routing
+│   ├── _anomaly_engine.py      # Deterministic anomaly detection logic
+│   ├── _data_generator.py      # Synthetic data generation logic
+│   └── requirements.txt        # Python dependencies
+├── frontend/                   # React + Vite + TypeScript frontend
+│   ├── src/
+│   │   ├── components/         # React components (Dashboards, Maps, Tables)
+│   │   ├── api.ts              # Centralized API fetch client
+│   │   ├── types.ts            # Shared TypeScript interfaces
+│   │   ├── App.tsx             # Routing configuration
+│   │   └── main.tsx            # React DOM entry point
+│   └── package.json            # Node.js dependencies
+├── docs/                       # Project Documentation
+├── .github/workflows/          # CI/CD Pipelines
+└── vercel.json                 # Vercel Deployment Configuration
+```
 
 ---
 
-## 🚀 Tech Stack
+## 📖 API Documentation
 
-- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, React Leaflet (WebGIS)
-- **Backend**: Python 3.13, FastAPI
-- **Data**: Deterministic synthetic dataset (JSON/SQLite) simulating 12,000+ FRA claims.
+The backend exposes a comprehensive RESTful API for querying FRA claims and generating metrics. 
+For a complete list of endpoints, see the [API Documentation](docs/API.md).
+
+---
 
 ## 🛠️ Local Setup & Development
 
@@ -58,16 +100,13 @@ VANTARA is powered by a highly sophisticated Python data generator that accurate
 
 ### 1. Start the Backend (FastAPI)
 ```bash
-cd backend
+cd api
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-# Generate the realistic synthetic dataset (~12,000 claims)
-python data_generator.py
-
-# Run the server
-python main.py
+# Run the local dev server
+uvicorn index:app --reload --port 8000
 ```
 *The backend will run on `http://localhost:8000`*
 
@@ -82,11 +121,23 @@ npm run dev
 
 ---
 
-## 🎨 Design Philosophy
-VANTARA strictly adheres to NIC (National Informatics Centre) layout standards:
-- **High-Contrast Light Theme**: Built for readability in brightly lit government offices (`bg-gray-50`, `bg-white` cards).
-- **Official Muted Colors**: Navy headers (`#1e3a5f`), standard flat pill badges.
-- **Zero Dead Code**: Every button, filter, and modal is fully wired end-to-end to the FastAPI backend.
+## 🔐 Environment Variables
+
+| Variable | Location | Description | Required |
+|----------|----------|-------------|----------|
+| `VITE_API_BASE` | `frontend/.env` | Override API base URL (e.g., `http://localhost:8000/api`) | No (defaults to `/api`) |
 
 ---
-*Built for the Adivasi Rights Administration Hackathon.*
+
+## 🤝 Contributing
+
+We welcome contributions! Please review our:
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+
+---
+
+## 📄 License
+
+VANTARA is open-source software licensed under the [MIT License](LICENSE).
