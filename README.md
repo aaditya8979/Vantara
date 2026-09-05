@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌳 VANTARA
+# <img src="https://api.iconify.design/lucide/trees.svg?color=%2310b981" width="36" align="center" style="margin-right: 8px;" /> VANTARA
 
 **Verified Anomaly Navigation & Tracking for Adivasi Rights Administration**
 
@@ -13,13 +13,13 @@
 
 *An AI-driven operational intelligence platform designed to eliminate bureaucratic stagnation and enforce the Forest Rights Act (FRA), 2006.*
 
-[**🚀 View Live Deployment on Vercel**](https://vantara-nakshatra.vercel.app/) • [**📖 Read the Docs**](docs/ARCHITECTURE.md) • [**🐛 Report a Bug**](https://github.com/aaditya8979/Vantara/issues)
+[**<img src="https://api.iconify.design/lucide/rocket.svg?color=%233b82f6" width="18" align="center" style="margin-right: 4px;" /> View Live Deployment on Vercel**](https://vantara-nakshatra.vercel.app/) • [**<img src="https://api.iconify.design/lucide/book-open.svg?color=%238b5cf6" width="18" align="center" style="margin-right: 4px;" /> Read the Docs**](docs/ARCHITECTURE.md) • [**<img src="https://api.iconify.design/lucide/bug.svg?color=%23ef4444" width="18" align="center" style="margin-right: 4px;" /> Report a Bug**](https://github.com/aaditya8979/Vantara/issues)
 
 </div>
 
 ---
 
-## 📖 Executive Summary
+## <img src="https://api.iconify.design/lucide/book-open-text.svg?color=%23f59e0b" width="28" align="center" style="margin-right: 8px;" /> Executive Summary
 
 The Forest Rights Act (FRA) of 2006 is a landmark legislation in India, but its implementation is plagued by severe bureaucratic bottlenecks, missing documentation, and systemic land mismatches. 
 
@@ -27,7 +27,7 @@ The Forest Rights Act (FRA) of 2006 is a landmark legislation in India, but its 
 
 <br/>
 
-## 🏛️ Asymmetric Role-Based Architecture
+## <img src="https://api.iconify.design/lucide/landmark.svg?color=%236366f1" width="28" align="center" style="margin-right: 8px;" /> Asymmetric Role-Based Architecture
 
 VANTARA acknowledges that a District Magistrate needs different tools than a State Secretary. The platform bifurcates data based on the statutory powers of the viewer:
 
@@ -66,7 +66,7 @@ mindmap
 
 <br/>
 
-## 🧠 The Anomaly Engine & Synthetic Data
+## <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%23d946ef" width="28" align="center" style="margin-right: 8px;" /> The Anomaly Engine & Synthetic Data
 
 VANTARA is powered by a highly sophisticated Python data generator that accurately models the grim realities of bureaucratic stagnation.
 
@@ -93,7 +93,7 @@ The backend calculates a **Systemic Anomaly Score** for each district by:
 
 <br/>
 
-## 🏗️ System Architecture
+## <img src="https://api.iconify.design/lucide/blocks.svg?color=%230ea5e9" width="28" align="center" style="margin-right: 8px;" /> System Architecture
 
 VANTARA operates as a highly decoupled, serverless architecture deployed entirely on Vercel.
 
@@ -123,7 +123,7 @@ sequenceDiagram
 
 <br/>
 
-## 🛠️ Local Development Setup
+## <img src="https://api.iconify.design/lucide/wrench.svg?color=%2364748b" width="28" align="center" style="margin-right: 8px;" /> Local Development Setup
 
 ### Prerequisites
 - Node.js (v18+)
@@ -153,7 +153,7 @@ npm run dev
 
 <br/>
 
-## 📁 Repository Structure
+## <img src="https://api.iconify.design/lucide/folder-tree.svg?color=%2314b8a6" width="28" align="center" style="margin-right: 8px;" /> Repository Structure
 
 ```
 ├── api/                        # FastAPI serverless backend (Vercel)
@@ -176,7 +176,7 @@ npm run dev
 
 <br/>
 
-## 🤝 Community & Support
+## <img src="https://api.iconify.design/lucide/handshake.svg?color=%23ec4899" width="28" align="center" style="margin-right: 8px;" /> Community & Support
 
 We welcome contributions from developers, designers, and policy experts.
 - Read our [Contributing Guidelines](CONTRIBUTING.md)
@@ -186,6 +186,6 @@ We welcome contributions from developers, designers, and policy experts.
 <br/>
 
 <div align="center">
-  <sub>Built with ❤️ for the Adivasi Rights Administration Hackathon</sub><br/>
+  <sub>Built with <img src="https://api.iconify.design/lucide/heart.svg?color=%23ef4444" width="14" align="center" /> for the Adivasi Rights Administration Hackathon</sub><br/>
   <sup>Licensed under the <a href="LICENSE">MIT License</a></sup>
 </div>
