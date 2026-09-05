@@ -12,8 +12,8 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from data_generator import save_data
-from anomaly_engine import run_anomaly_engine
+from _data_generator import save_data
+from _anomaly_engine import run_anomaly_engine
 
 # ─── Initialize ──────────────────────────────────────────────────────
 
