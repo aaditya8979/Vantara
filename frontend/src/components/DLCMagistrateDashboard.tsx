@@ -41,9 +41,11 @@ interface ViolationResponse {
 
 interface DLCMagistrateProps {
   onLogout: () => void;
+  activeDistrict?: string;
+  activeState?: string;
 }
 
-export default function DLCMagistrateDashboard({ onLogout }: DLCMagistrateProps) {
+export default function DLCMagistrateDashboard({ onLogout, activeDistrict = "Bastar", activeState = "Chhattisgarh" }: DLCMagistrateProps) {
   const [data, setData] = useState<ViolationResponse | null>(null);
   const [geojson, setGeojson] = useState<DistrictGeoJSON | null>(null);
   const [page, setPage] = useState(1);

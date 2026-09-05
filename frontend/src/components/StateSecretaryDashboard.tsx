@@ -49,14 +49,15 @@ interface MatrixResponse {
 
 interface StateSecretaryProps {
   onLogout: () => void;
+  activeState?: string;
 }
 
-export default function StateSecretaryDashboard({ onLogout }: StateSecretaryProps) {
+export default function StateSecretaryDashboard({ onLogout, activeState = "Jharkhand" }: StateSecretaryProps) {
   const [data, setData] = useState<MatrixResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [targetMonths, setTargetMonths] = useState(6);
-  const [stateFilter, setStateFilter] = useState<string | undefined>(undefined);
+  const [stateFilter, setStateFilter] = useState<string | undefined>(activeState);
 
   useEffect(() => {
     setLoading(true);

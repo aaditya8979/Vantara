@@ -118,10 +118,14 @@ function CommandCenter({ onLogout }: { onLogout: () => void }) {
 
 function RoleDashboard() {
   const [role, setRole] = useState<UserRole>(null);
+  const [activeState, setActiveState] = useState<string>("Jharkhand");
+  const [activeDistrict, setActiveDistrict] = useState<string>("Khunti");
   const navigate = useNavigate();
 
-  const handleRoleSelect = (r: UserRole) => {
+  const handleRoleSelect = (r: UserRole, state: string, district: string) => {
     setRole(r);
+    setActiveState(state);
+    setActiveDistrict(district);
     navigate("/dashboard");
   };
 
@@ -148,7 +152,6 @@ function RoleDashboard() {
   // No role selected — show Landing
   if (!role || location.pathname === "/") {
     if (role && location.pathname === "/") {
-      // User navigated back to root while role is set — reset
       setRole(null);
     }
     return <Landing onRoleSelect={handleRoleSelect} />;
@@ -157,11 +160,11 @@ function RoleDashboard() {
   // Role-specific dashboards
   switch (role) {
     case "sdlc_officer":
-      return <SDLCOfficerDashboard onLogout={handleLogout} />;
+      return <SDLCOfficerDashboard onLogout={handleLogout} activeDistrict={activeDistrict} activeState={activeState} />;
     case "dlc_magistrate":
-      return <DLCMagistrateDashboard onLogout={handleLogout} />;
+      return <DLCMagistrateDashboard onLogout={handleLogout} activeDistrict={activeDistrict} activeState={activeState} />;
     case "state_secretary":
-      return <StateSecretaryDashboard onLogout={handleLogout} />;
+      return <StateSecretaryDashboard onLogout={handleLogout} activeState={activeState} />;
     default:
       return <CommandCenter onLogout={handleLogout} />;
   }

@@ -31,9 +31,11 @@ interface QueueResponse {
 
 interface SDLCOfficerProps {
   onLogout: () => void;
+  activeDistrict?: string;
+  activeState?: string;
 }
 
-export default function SDLCOfficerDashboard({ onLogout }: SDLCOfficerProps) {
+export default function SDLCOfficerDashboard({ onLogout, activeDistrict = "Khunti", activeState = "Jharkhand" }: SDLCOfficerProps) {
   const [data, setData] = useState<QueueResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
