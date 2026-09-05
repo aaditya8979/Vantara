@@ -12,6 +12,7 @@ import ApplicantPortal from "./components/ApplicantPortal";
 import SDLCOfficerDashboard from "./components/SDLCOfficerDashboard";
 import DLCMagistrateDashboard from "./components/DLCMagistrateDashboard";
 import StateSecretaryDashboard from "./components/StateSecretaryDashboard";
+import VantaraCursor from "./components/VantaraCursor";
 
 /* ─── Generic Command Center (original dashboard) ─────────── */
 
@@ -173,6 +174,8 @@ function RoleDashboard() {
 export default function App() {
   return (
     <BrowserRouter>
+      {/* Global cursor companion — present on every page */}
+      <VantaraCursor />
       <Routes>
         <Route path="/*" element={<RoleDashboard />} />
       </Routes>

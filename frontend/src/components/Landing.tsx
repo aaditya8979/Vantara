@@ -287,7 +287,8 @@ export default function Landing({ onRoleSelect }: LandingProps) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 8, background: "#1e3a5f", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18 }}>V</div>
+              {/* VANTARA Logo — tree with two people */}
+              <img src="/vantara-logo.png" alt="VANTARA Logo" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "contain", background: "white", border: "2px solid #1e3a5f", padding: 2 }} />
               <div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#1e3a5f", letterSpacing: "0.1em" }}>VANTARA</div>
                 <div style={{ fontSize: 10, color: "#6b7280" }}>{t("AUTHORIZED MONITORING SYSTEM", isHindi)}</div>
@@ -306,17 +307,17 @@ export default function Landing({ onRoleSelect }: LandingProps) {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
           <ul role="menubar" style={{ display: "flex", listStyle: "none", margin: 0, padding: 0 }}>
             {[
-              { key: "Home", href: "#" },
-              { key: "About FRA", href: "#about" },
-              { key: "Dashboard", href: "#", highlight: true },
-              { key: "Knowledge Hub", href: "#knowledge" },
-              { key: "Key Provisions", href: "#provisions" },
-              { key: "Progress Report", href: "#", section: "progress" as const },
-              { key: "Review Meeting", href: "#", section: "meeting" as const },
-              { key: "Contact Us", href: "#", section: "contact" as const },
+              { key: "Home", href: "#", hint: "nav-home" },
+              { key: "About FRA", href: "#about", hint: "nav-provisions" },
+              { key: "Dashboard", href: "#", highlight: true, hint: "nav-dashboard" },
+              { key: "Knowledge Hub", href: "#knowledge", hint: "nav-knowledge" },
+              { key: "Key Provisions", href: "#provisions", hint: "nav-provisions" },
+              { key: "Progress Report", href: "#", section: "progress" as const, hint: "nav-progress" },
+              { key: "Review Meeting", href: "#", section: "meeting" as const, hint: "nav-meeting" },
+              { key: "Contact Us", href: "#", section: "contact" as const, hint: "nav-contact" },
             ].map((item, i) => (
               <li key={item.key} role="none">
-                <a href={item.href} role="menuitem"
+                <a href={item.href} role="menuitem" data-hint={item.hint}
                   onClick={(e) => {
                     e.preventDefault();
                     if (item.key === "Dashboard") openLogin();
@@ -343,7 +344,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
       </nav>
 
       {/* ── Hero Banner ── */}
-      <div style={{ position: "relative", height: 420, overflow: "hidden" }}>
+      <div data-hint="hero" id="tour-hero" style={{ position: "relative", height: 420, overflow: "hidden" }}>
         <img src="/hero.jpg" alt="Tribal Gram Sabha and Forest Communities" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.40) 55%, rgba(0,0,0,0.16) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, maxWidth: 1200, margin: "0 auto", padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "center", left: 0, right: 0 }}>
@@ -378,7 +379,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
       </div>
 
       {/* ── Stats Bar ── */}
-      <div style={{ background: "#1e3a5f" }}>
+      <div data-hint="stats-bar" id="tour-stats-bar" style={{ background: "#1e3a5f" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 0", display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderLeft: "1px solid rgba(148,163,184,0.2)" }}>
           {FRA_STATS.map((stat) => (
             <div key={stat.label} style={{ textAlign: "center", padding: "0 24px", borderRight: "1px solid rgba(148,163,184,0.2)" }}>
@@ -477,59 +478,8 @@ export default function Landing({ onRoleSelect }: LandingProps) {
         </div>
       </section>
 
-      {/* ── Contact Us Section ── */}
-      <section id="section-contact" style={{ background: "#f9fafb", borderBottom: "1px solid #e5e7eb", padding: "32px 0" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-            <div style={{ width: 4, height: 24, background: "#15803d", borderRadius: 2 }} />
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>
-              {t("Contact Us", isHindi)} — Ministry of Tribal Affairs
-            </h2>
-          </div>
-          {/* Address block */}
-          <div style={{ background: "#1e3a5f", color: "white", borderRadius: 8, padding: "16px 20px", marginBottom: 16, display: "flex", gap: 32, flexWrap: "wrap" }}>
-            <div>
-              <div style={{ fontSize: 12, color: "#93c5fd", marginBottom: 4, fontWeight: 600 }}>POSTAL ADDRESS</div>
-              <div style={{ fontSize: 13, lineHeight: 1.7 }}>Ministry of Tribal Affairs<br />Jeevan Tara Building, Gate No. 5<br />Ashoka Road, Patel Chowk<br />New Delhi — 110001</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: "#93c5fd", marginBottom: 4, fontWeight: 600 }}>TOLL-FREE HELPLINE</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#fde68a" }}>1800-11-2001</div>
-              <div style={{ fontSize: 11, color: "#93c5fd" }}>Mon – Fri, 9:00 AM – 6:00 PM</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: "#93c5fd", marginBottom: 4, fontWeight: 600 }}>VANTARA SYSTEM HELPDESK</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "white" }}>011-24013698</div>
-              <div style={{ fontSize: 11, color: "#93c5fd" }}>For technical issues with this portal</div>
-            </div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-            {CONTACTS.map((c) => (
-              <div key={c.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 8, padding: "14px 16px" }}>
-                <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 2 }}>{c.name}</div>
-                <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>{c.designation}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
-                    <span>📞</span>
-                    <a href={`tel:${c.phone.replace(/[^0-9]/g, "")}`} style={{ color: "#1e5fa4", fontWeight: 600, textDecoration: "none" }}>{c.phone}</a>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#4b5563" }}>
-                    <span>✉️</span>
-                    <span>{c.email}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
-                    <span>📍</span>
-                    <span>{c.addr}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── About FRA ── */}
-      <section id="about" style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 16px" }}>
+      <section id="about" data-hint="about-fra" style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <div style={{ width: 4, height: 24, background: "#b91c1c", borderRadius: 2 }} />
           <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>{t("Forest Rights Act", isHindi)}</h2>
@@ -582,7 +532,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
       </section>
 
       {/* ── Knowledge Hub ── */}
-      <section id="knowledge" style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 16px" }}>
+      <section id="knowledge" data-hint="knowledge-hub" style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
           <div style={{ width: 4, height: 24, background: "#b91c1c", borderRadius: 2 }} />
           <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>{t("Knowledge Hub", isHindi)} — Key Documents</h2>
@@ -604,8 +554,95 @@ export default function Landing({ onRoleSelect }: LandingProps) {
         </div>
       </section>
 
+      {/* ── Progress Report ── (moved here: after Knowledge Hub) */}
+      <section id="section-progress" data-hint="progress-table" style={{ background: "#f0f7ff", borderTop: "3px solid #1e5fa4", borderBottom: "1px solid #bfdbfe", padding: "32px 0" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 4, height: 24, background: "#1e5fa4", borderRadius: 2 }} />
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>
+                {t("Progress Report", isHindi)} — State-wise FRA Implementation (March 2023)
+              </h2>
+            </div>
+            <a href="https://tribal.nic.in/FRA.aspx" target="_blank" rel="noopener" style={{ fontSize: 12, color: "#1e5fa4", fontWeight: 600, textDecoration: "none", border: "1px solid #bfdbfe", borderRadius: 4, padding: "4px 12px", background: "white" }}>
+              View Full MoTA Report ↗
+            </a>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", background: "white", borderRadius: 8, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.08)", fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: "#1e3a5f", color: "white" }}>
+                  {["#", "State", "Claims Filed", "Titles Given", "Rejected", "Pending", "Settlement %"].map((h) => (
+                    <th key={h} style={{ padding: "10px 14px", textAlign: h === "#" || h === "Settlement %" ? "center" : "left", fontWeight: 600, fontSize: 12 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {STATE_PROGRESS.map((row, idx) => (
+                  <tr key={row.state} style={{ background: idx % 2 === 0 ? "white" : "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
+                    <td style={{ padding: "9px 14px", textAlign: "center", color: "#6b7280", fontWeight: 600 }}>{idx + 1}</td>
+                    <td style={{ padding: "9px 14px", fontWeight: 700, color: "#1e3a5f" }}>{row.state}</td>
+                    <td style={{ padding: "9px 14px", fontFamily: "monospace" }}>{row.filed}</td>
+                    <td style={{ padding: "9px 14px", fontFamily: "monospace", color: "#15803d", fontWeight: 600 }}>{row.approved}</td>
+                    <td style={{ padding: "9px 14px", fontFamily: "monospace", color: "#b91c1c" }}>{row.rejected}</td>
+                    <td style={{ padding: "9px 14px", fontFamily: "monospace", color: "#d97706" }}>{row.pending}</td>
+                    <td style={{ padding: "9px 14px", textAlign: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <div style={{ flex: 1, height: 8, background: "#e5e7eb", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${row.pct}%`, background: row.pct > 75 ? "#16a34a" : row.pct > 50 ? "#d97706" : "#dc2626", borderRadius: 4 }} />
+                        </div>
+                        <span style={{ fontWeight: 700, fontSize: 12, color: row.pct > 75 ? "#15803d" : row.pct > 50 ? "#b45309" : "#b91c1c", minWidth: 36 }}>{row.pct}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ marginTop: 10, fontSize: 11, color: "#6b7280" }}>
+            Source: MoTA Monthly Progress Report, March 2023. Data reflects cumulative figures from FRA implementation inception.
+          </div>
+        </div>
+      </section>
+
+      {/* ── Review Meeting ── */}
+      <section id="section-meeting" style={{ background: "white", borderBottom: "1px solid #e5e7eb", padding: "32px 0" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 4, height: 24, background: "#b91c1c", borderRadius: 2 }} />
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>
+                {t("Review Meeting", isHindi)} — MoTA Meeting Minutes &amp; Circulars
+              </h2>
+            </div>
+            <a href="https://tribal.nic.in/FRA.aspx" target="_blank" rel="noopener" style={{ fontSize: 12, color: "#b91c1c", fontWeight: 600, textDecoration: "none", border: "1px solid #fca5a5", borderRadius: 4, padding: "4px 12px" }}>
+              View All Minutes ↗
+            </a>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {REVIEW_MEETINGS.map((m) => (
+              <a key={m.title} href={m.link} target="_blank" rel="noopener"
+                style={{ display: "flex", gap: 12, border: "1px solid #e5e7eb", borderRadius: 8, padding: "14px 16px", textDecoration: "none", color: "inherit", background: "#fafafa", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#1e5fa4"; (e.currentTarget as HTMLElement).style.background = "#f0f7ff"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e5e7eb"; (e.currentTarget as HTMLElement).style.background = "#fafafa"; }}
+              >
+                <div style={{ width: 44, height: 44, borderRadius: 8, background: "#e8edf5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📅</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: "#1e5fa4", background: "#eff6ff", padding: "2px 8px", borderRadius: 20 }}>{m.type}</span>
+                    <span style={{ fontSize: 11, color: "#9ca3af" }}>{m.date}</span>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e3a5f", lineHeight: 1.4, marginBottom: 4 }}>{m.title}</div>
+                  <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 500 }}>✓ {m.status}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Officer Login CTA ── */}
-      <section style={{ background: "#1e3a5f", color: "white", padding: "44px 0", textAlign: "center" }}>
+      <section data-hint="login-cta" id="tour-login-cta" style={{ background: "#1e3a5f", color: "white", padding: "44px 0", textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 16px" }}>
           <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>{t("Authorized Officer Access", isHindi)}</h2>
           <p style={{ color: "#93c5fd", fontSize: 14, marginBottom: 24, lineHeight: 1.7 }}>
@@ -656,7 +693,9 @@ export default function Landing({ onRoleSelect }: LandingProps) {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
                   {ROLES.map((role) => (
                     <button key={role.id} onClick={() => handleRoleClick(role)}
-                      style={{ border: "2px solid #e5e7eb", borderRadius: 12, padding: 20, textAlign: "left", cursor: "pointer", background: "white", transition: "all 0.2s", width: "100%" }}
+                      data-hint={role.id === "sdlc_officer" ? "role-sdlc" : role.id === "dlc_magistrate" ? "role-dlc" : "role-secretary"}
+                      id={role.id === "sdlc_officer" ? "tour-role-sdlc" : role.id === "dlc_magistrate" ? "tour-role-dlc" : "tour-role-secretary"}
+                      style={{ border: "2px solid #e5e7eb", borderRadius: 12, padding: 20, textAlign: "left", cursor: "none", background: "white", transition: "all 0.2s", width: "100%" }}
                       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#1e5fa4"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(30,95,164,0.15)"; }}
                       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e5e7eb"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                     >
