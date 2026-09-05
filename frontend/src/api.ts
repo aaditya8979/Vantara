@@ -50,27 +50,27 @@ export async function postOfficerAction(
 }
 
 export async function fetchDistrictGeoJSON() {
-  const res = await fetch(`${API_BASE}/api/geojson/districts`);
+  const res = await fetch(`${API_BASE}/geojson/districts`);
   return res.json();
 }
 
 export async function fetchStates() {
-  const res = await fetch(`${API_BASE}/api/states`);
+  const res = await fetch(`${API_BASE}/states`);
   return res.json();
 }
 
 export async function fetchAIClaimSummary(claimId: string) {
-  const res = await fetch(`${API_BASE}/api/ai/claim-summary/${claimId}`);
+  const res = await fetch(`${API_BASE}/ai/claim-summary/${claimId}`);
   return res.json();
 }
 
 export async function fetchAIDistrictSummary(districtName: string) {
-  const res = await fetch(`${API_BASE}/api/ai/district-summary/${districtName}`);
+  const res = await fetch(`${API_BASE}/ai/district-summary/${districtName}`);
   return res.json();
 }
 
 export async function fetchApplicantView(claimId: string) {
-  const res = await fetch(`${API_BASE}/api/applicant/${claimId}`);
+  const res = await fetch(`${API_BASE}/applicant/${claimId}`);
   return res.json();
 }
 
@@ -87,7 +87,7 @@ export async function fetchSDLCQueue(filters: {
   if (filters.district) params.set("district", filters.district);
   if (filters.page) params.set("page", String(filters.page));
   if (filters.page_size) params.set("page_size", String(filters.page_size));
-  const res = await fetch(`${API_BASE}/api/sdlc/queue?${params}`);
+  const res = await fetch(`${API_BASE}/sdlc/queue?${params}`);
   return res.json();
 }
 
@@ -102,13 +102,13 @@ export async function fetchDLCViolations(filters: {
   if (filters.violation_type) params.set("violation_type", filters.violation_type);
   if (filters.page) params.set("page", String(filters.page));
   if (filters.page_size) params.set("page_size", String(filters.page_size));
-  const res = await fetch(`${API_BASE}/api/dlc/violations?${params}`);
+  const res = await fetch(`${API_BASE}/dlc/violations?${params}`);
   return res.json();
 }
 
 export async function fetchStateMatrix(state?: string) {
   const params = new URLSearchParams();
   if (state) params.set("state", state);
-  const res = await fetch(`${API_BASE}/api/state/matrix?${params}`);
+  const res = await fetch(`${API_BASE}/state/matrix?${params}`);
   return res.json();
 }
