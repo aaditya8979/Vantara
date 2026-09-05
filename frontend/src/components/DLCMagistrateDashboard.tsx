@@ -2,6 +2,7 @@
 /* Enhanced: Legal Enforcement Engine • All-state Leaflet Map  */
 
 import { useEffect, useState, useRef } from "react";
+import { ArrowLeft, ChevronDown, Download, FileText, Globe, Search, Scale, Ruler, ScrollText, Printer, CircleAlert } from "lucide-react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchDLCViolations, fetchDistrictGeoJSON } from "../api";
@@ -122,7 +123,7 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {data && data.stats.statutory_violations > 0 && (
               <div style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 8, padding: "4px 12px", fontSize: 11, color: "white", fontWeight: 600 }}>
-                ⚖️ {data.stats.statutory_violations} Rule 12(2) Breaches
+                <Scale size={16} className="inline mr-1" /> {data.stats.statutory_violations} Rule 12(2) Breaches
               </div>
             )}
             <button id="tour-switch-role" onClick={onLogout} style={{ fontSize: 12, color: "#fca5a5", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 6, padding: "6px 14px", cursor: "pointer" }}>
@@ -235,8 +236,8 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
             {data && (
               <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #e5e7eb" }}>
                 <div style={{ fontWeight: 700, color: "#111827", fontSize: 13 }}>{district}</div>
-                <div style={{ color: "#dc2626", fontWeight: 600 }}>⚖️ {data.stats.statutory_violations} violations</div>
-                <div style={{ color: "#d97706", fontWeight: 600 }}>📐 {data.stats.land_mismatches} land mismatches</div>
+                <div style={{ color: "#dc2626", fontWeight: 600, display: "flex", alignItems: "center" }}><Scale size={16} className="mr-1" /> {data.stats.statutory_violations} violations</div>
+                <div style={{ color: "#d97706", fontWeight: 600, display: "flex", alignItems: "center" }}><Ruler size={16} className="mr-1" /> {data.stats.land_mismatches} land mismatches</div>
               </div>
             )}
           </div>
@@ -249,8 +250,8 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
           <div style={{ background: "white", borderBottom: "1px solid #e5e7eb", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             {[
               { id: undefined, label: `All (${data?.total ?? "..."})`, activeColor: "#1e3a5f" },
-              { id: "STATUTORY_VIOLATION", label: "⚖️ Statutory", activeColor: "#b91c1c" },
-              { id: "LAND_MISMATCH", label: "📐 Land Mismatch", activeColor: "#b45309" },
+              { id: "STATUTORY_VIOLATION", label: <span className="flex items-center"><Scale size={14} className="mr-1" /> Statutory</span>, activeColor: "#b91c1c" },
+              { id: "LAND_MISMATCH", label: <span className="flex items-center"><Ruler size={14} className="mr-1" /> Land Mismatch</span>, activeColor: "#b45309" },
             ].map(f => (
               <button key={String(f.id)} onClick={() => { setFilterType(f.id); setPage(1); }}
                 id={f.id === "STATUTORY_VIOLATION" ? "tour-dlc-filter-stat" : undefined}
@@ -262,11 +263,11 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
             <button onClick={() => openDirective("rule12", statutoryClaims)} disabled={statutoryClaims.length === 0}
               id="tour-btn-rule12"
               style={{ fontSize: 12, fontWeight: 600, padding: "7px 14px", borderRadius: 8, border: "none", cursor: statutoryClaims.length > 0 ? "pointer" : "not-allowed", background: statutoryClaims.length > 0 ? "linear-gradient(135deg, #b91c1c, #7f1d1d)" : "#e5e7eb", color: statutoryClaims.length > 0 ? "white" : "#9ca3af", boxShadow: statutoryClaims.length > 0 ? "0 2px 8px rgba(185,28,28,0.35)" : "none", transition: "all 0.2s" }}>
-              📜 Issue Rule 12(2) Directive ({statutoryClaims.length})
+              <ScrollText size={16} className="inline mr-2" /> Issue Rule 12(2) Directive ({statutoryClaims.length})
             </button>
             <button onClick={() => openDirective("cadastral", landClaims)} disabled={landClaims.length === 0}
               style={{ fontSize: 12, fontWeight: 600, padding: "7px 14px", borderRadius: 8, border: "none", cursor: landClaims.length > 0 ? "pointer" : "not-allowed", background: landClaims.length > 0 ? "linear-gradient(135deg, #d97706, #b45309)" : "#e5e7eb", color: landClaims.length > 0 ? "white" : "#9ca3af", transition: "all 0.2s" }}>
-              📐 Cadastral Inspection ({landClaims.length})
+              <Ruler size={16} className="inline mr-2" /> Cadastral Inspection ({landClaims.length})
             </button>
           </div>
 
@@ -321,7 +322,7 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
                               color: /Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "#b91c1c" : "#b45309",
                               border: `1px solid ${/Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "#fca5a5" : "#fcd34d"}`,
                             }} title={c.land_mismatch_root_cause}>
-                              {/Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "🔴 Structural" : "🟡 Administrative"}
+                              {/Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? <span className="flex items-center"><CircleAlert size={14} className="mr-1 text-red-600" /> Structural</span> : <span className="flex items-center"><CircleAlert size={14} className="mr-1 text-yellow-500" /> Administrative</span>}
                             </span>
                           ) : <span style={{ color: "#d1d5db" }}>—</span>}
                         </td>
@@ -372,7 +373,7 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
             <div style={{ padding: "16px 24px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fef2f2", borderRadius: "14px 14px 0 0" }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#7f1d1d" }}>
-                  {directiveType === "rule12" ? "📜 Statutory Directive — FRA Rule 12(2)" : "📐 Joint Cadastral Inspection Order"}
+                  {directiveType === "rule12" ? <span className="flex items-center text-lg"><ScrollText size={20} className="mr-2" /> Statutory Directive — FRA Rule 12(2)</span> : <span className="flex items-center text-lg"><Ruler size={20} className="mr-2" /> Joint Cadastral Inspection Order</span>}
                 </h3>
                 <p style={{ margin: "3px 0 0", fontSize: 12, color: "#9ca3af" }}>
                   {directiveClaims.length} claims • {district}, {activeState} • Ref: {refNo.current}
@@ -380,7 +381,7 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activ
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={handlePrint} style={{ fontSize: 12, background: "#b91c1c", color: "white", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600 }}>
-                  🖨️ Print / Save PDF
+                  <Printer size={16} className="inline mr-2" /> Print / Save PDF
                 </button>
                 <button onClick={() => setShowDirective(false)} style={{ fontSize: 12, background: "white", border: "1px solid #d1d5db", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "#374151" }}>
                   Close

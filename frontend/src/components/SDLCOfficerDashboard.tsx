@@ -2,6 +2,7 @@
 /* Enhanced UI: Batch Execution Engine for Incomplete Records  */
 
 import { useEffect, useState, useRef } from "react";
+import { ArrowLeft, ChevronDown, Download, FileText, Globe, Search, ClipboardList, BarChart, MapPin, CheckCircle, TriangleAlert, Printer } from "lucide-react";
 import { fetchSDLCQueue } from "../api";
 
 interface QueueClaim {
@@ -154,8 +155,8 @@ export default function SDLCOfficerDashboard({ onLogout, activeDistrict, activeS
         {/* Sub-nav tabs */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", padding: "0 20px" }}>
           {[
-            { id: "queue", label: "📋 Incomplete Records Queue" },
-            { id: "analytics", label: "📊 Batch Analytics" },
+            { id: "queue", label: <span className="flex items-center"><ClipboardList size={14} className="mr-1" /> Incomplete Records Queue</span> },
+            { id: "analytics", label: <span className="flex items-center"><BarChart size={14} className="mr-1" /> Batch Analytics</span> },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
               style={{ padding: "8px 16px", fontSize: 12, fontWeight: 500, border: "none", cursor: "pointer", background: "transparent", color: activeTab === tab.id ? "white" : "rgba(255,255,255,0.6)", borderBottom: activeTab === tab.id ? "2px solid white" : "2px solid transparent", transition: "all 0.15s" }}>
@@ -189,12 +190,12 @@ export default function SDLCOfficerDashboard({ onLogout, activeDistrict, activeS
       <div style={{ background: "#f9fafb", borderBottom: "1px solid #e5e7eb", padding: "10px 20px", display: "flex", alignItems: "center", gap: 10 }}>
         <button onClick={() => openManifest("survey")} disabled={selected.size === 0}
           style={{ fontSize: 12, fontWeight: 600, background: selected.size > 0 ? "linear-gradient(135deg, #d97706, #b45309)" : "#e5e7eb", color: selected.size > 0 ? "white" : "#9ca3af", border: "none", borderRadius: 8, padding: "8px 18px", cursor: selected.size > 0 ? "pointer" : "not-allowed", boxShadow: selected.size > 0 ? "0 2px 8px rgba(180,83,9,0.3)" : "none", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6 }}>
-          📋 Generate Patwari Survey Batch
+          <ClipboardList size={16} className="inline mr-2" /> Generate Patwari Survey Batch
           {selected.size > 0 && <span style={{ background: "rgba(255,255,255,0.25)", borderRadius: 20, padding: "1px 8px", fontSize: 11 }}>{selected.size}</span>}
         </button>
         <button onClick={() => openManifest("gps")} disabled={selected.size === 0}
           style={{ fontSize: 12, fontWeight: 600, background: selected.size > 0 ? "linear-gradient(135deg, #7c3aed, #6d28d9)" : "#e5e7eb", color: selected.size > 0 ? "white" : "#9ca3af", border: "none", borderRadius: 8, padding: "8px 18px", cursor: selected.size > 0 ? "pointer" : "not-allowed", boxShadow: selected.size > 0 ? "0 2px 8px rgba(109,40,217,0.3)" : "none", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6 }}>
-          📍 Gram Sabha GPS Checklist
+          <MapPin size={16} className="inline mr-2" /> Gram Sabha GPS Checklist
           {selected.size > 0 && <span style={{ background: "rgba(255,255,255,0.25)", borderRadius: 20, padding: "1px 8px", fontSize: 11 }}>{selected.size}</span>}
         </button>
         <div style={{ flex: 1 }} />
@@ -212,7 +213,7 @@ export default function SDLCOfficerDashboard({ onLogout, activeDistrict, activeS
             </div>
           ) : !data || data.claims.length === 0 ? (
             <div style={{ padding: 48, textAlign: "center", color: "#9ca3af" }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+              <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}><CheckCircle size={32} className="text-green-500" /></div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>No incomplete records found</div>
               <div style={{ fontSize: 12 }}>All claims in {district} are up to date</div>
             </div>
@@ -276,7 +277,7 @@ export default function SDLCOfficerDashboard({ onLogout, activeDistrict, activeS
                             color: isCritical ? "#dc2626" : isUrgent ? "#d97706" : "#6b7280",
                             border: `1px solid ${isCritical ? "#fca5a5" : isUrgent ? "#fcd34d" : "#e5e7eb"}`
                           }}>
-                            {isCritical && "⚠️ "}{c.days_in_current_stage}d
+                            {isCritical && <TriangleAlert size={14} className="inline text-yellow-500 mr-1" />}{c.days_in_current_stage}d
                           </span>
                         ) : "—"}
                       </td>
@@ -368,7 +369,7 @@ export default function SDLCOfficerDashboard({ onLogout, activeDistrict, activeS
             <div style={{ padding: "18px 24px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f9fafb", borderRadius: "14px 14px 0 0" }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#111827" }}>
-                  {manifestType === "survey" ? "📋 Patwari Survey Batch Manifest" : "📍 Gram Sabha GPS Verification Checklist"}
+                  {manifestType === "survey" ? <span className="flex items-center text-lg"><ClipboardList size={20} className="mr-2" /> Patwari Survey Batch Manifest</span> : <span className="flex items-center text-lg"><MapPin size={20} className="mr-2" /> Gram Sabha GPS Verification Checklist</span>}
                 </h3>
                 <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6b7280" }}>
                   {selectedClaims.length} claims selected • {district}, {activeState} • Generated {new Date().toLocaleDateString("en-IN")}
@@ -377,7 +378,7 @@ export default function SDLCOfficerDashboard({ onLogout, activeDistrict, activeS
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={handlePrint} id="tour-btn-survey"
                   style={{ fontSize: 12, background: "#1e5fa4", color: "white", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600 }}>
-                  🖨️ Print / Save PDF
+                  <Printer size={16} className="inline mr-2" /> Print / Save PDF
                 </button>
                 <button onClick={() => setShowManifest(false)}
                   style={{ fontSize: 12, background: "white", border: "1px solid #d1d5db", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "#374151" }}>

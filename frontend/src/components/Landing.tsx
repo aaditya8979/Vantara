@@ -10,6 +10,7 @@
    ──────────────────────────────────────────────────────────────────── */
 
 import { useState, useEffect } from "react";
+import { Home, Trees, ClipboardList, Scale, Landmark, ScrollText, Book, HelpCircle, Map, BarChart, Lock, Calendar, Phone, MapPin, Wheat, Mountain } from "lucide-react";
 
 export type UserRole = "sdlc_officer" | "dlc_magistrate" | "state_secretary" | null;
 
@@ -79,25 +80,25 @@ const CONTACTS = [
 
 // ── Key Provisions ────────────────────────────────────────────────────
 const KEY_PROVISIONS = [
-  { title: "Individual Forest Rights", desc: "Rights of forest dwelling STs and OTFDs to hold and live in forest land under individual or common occupation before 13 Dec 2005.", icon: "🏠", rule: "Section 3(1)(a)" },
-  { title: "Community Forest Rights", desc: "Rights of communities, including rights of community tenures of habitat & habitation for PTGs, pre-agricultural communities.", icon: "🌳", rule: "Section 3(1)(e)" },
-  { title: "SDLC Verification", desc: "Sub-Divisional Level Committee must verify and forward claims to DLC within 60 days. Gram Sabha recommendation is mandatory.", icon: "📋", rule: "Rule 12(2)" },
-  { title: "DLC Approval", desc: "District Level Committee is the final authority to approve or reject. Rejection must be in writing with reasons and allow appeal.", icon: "⚖️", rule: "Rule 13" },
-  { title: "State Level Monitoring", desc: "The State Level Monitoring Committee oversees implementation, resolves disputes between DLC, and can remand to SDLC.", icon: "🏛️", rule: "Section 6(6)" },
-  { title: "Right to Appeal", desc: "Any person aggrieved by rejection can appeal before the SDLC or the Gram Sabha within 60 days of communication of rejection.", icon: "📜", rule: "Section 8" },
+  { title: "Individual Forest Rights", desc: "Rights of forest dwelling STs and OTFDs to hold and live in forest land under individual or common occupation before 13 Dec 2005.", icon: <Home size={22} className="text-amber-500" />, rule: "Section 3(1)(a)" },
+  { title: "Community Forest Rights", desc: "Rights of communities, including rights of community tenures of habitat & habitation for PTGs, pre-agricultural communities.", icon: <Trees size={22} className="text-green-600" />, rule: "Section 3(1)(e)" },
+  { title: "SDLC Verification", desc: "Sub-Divisional Level Committee must verify and forward claims to DLC within 60 days. Gram Sabha recommendation is mandatory.", icon: <ClipboardList size={22} className="text-blue-500" />, rule: "Rule 12(2)" },
+  { title: "DLC Approval", desc: "District Level Committee is the final authority to approve or reject. Rejection must be in writing with reasons and allow appeal.", icon: <Scale size={22} className="text-indigo-500" />, rule: "Rule 13" },
+  { title: "State Level Monitoring", desc: "The State Level Monitoring Committee oversees implementation, resolves disputes between DLC, and can remand to SDLC.", icon: <Landmark size={22} className="text-red-500" />, rule: "Section 6(6)" },
+  { title: "Right to Appeal", desc: "Any person aggrieved by rejection can appeal before the SDLC or the Gram Sabha within 60 days of communication of rejection.", icon: <ScrollText size={22} className="text-amber-700" />, rule: "Section 8" },
 ];
 
 // ── Knowledge Docs ────────────────────────────────────────────────────
 const KEY_DOCS = [
-  { title: "The FRA Act & Rules Book", type: "Act", link: "https://tribal.nic.in/downloads/FRA/FRAActnRulesBook.pdf", icon: "📘" },
-  { title: "FAQ — FRA (English)", type: "FAQ", link: "https://tribal.nic.in/downloads/FRA/FAQ/FAQ ENGLISH_Approved_compressed.pdf", icon: "❓" },
-  { title: "FAQ — FRA (Hindi)", type: "अक्सर पूछे जाने वाले प्रश्न", link: "https://tribal.nic.in/downloads/FRA/FAQ/FAQ Booklet Hindi_Approved.pdf", icon: "❓" },
-  { title: "GED-1: CFR Guidelines", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED- 1 Guidelines for Conservation, Management and Sustainable use of Community Forest Resources(CFR).pdf", icon: "📋" },
-  { title: "GED-15: Rejection Reasons", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-15 Reason of Rejection dated 15.07.2010.pdf", icon: "📋" },
-  { title: "GED-25: Implementation Guidelines", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-25 FRA implementation Guidelines dated 12.07.2012.pdf", icon: "📋" },
-  { title: "GED-28: Geo-referencing Guide", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-28 Guidelines for geo-referencing and Potentiality mapping_27.07.2015.pdf", icon: "🗺️" },
-  { title: "Draft SLMC Report", type: "Report", link: "https://tribal.nic.in/downloads/FRA/Draft_Report06012021.pdf", icon: "📊" },
-  { title: "GED-16: SLMC Monitoring", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-16 Monitoring with SLMC  - letter dated 20.07.2010.pdf", icon: "📋" },
+  { title: "The FRA Act & Rules Book", type: "Act", link: "https://tribal.nic.in/downloads/FRA/FRAActnRulesBook.pdf", icon: <Book size={18} className="text-blue-600" /> },
+  { title: "FAQ — FRA (English)", type: "FAQ", link: "https://tribal.nic.in/downloads/FRA/FAQ/FAQ ENGLISH_Approved_compressed.pdf", icon: <HelpCircle size={18} className="text-gray-500" /> },
+  { title: "FAQ — FRA (Hindi)", type: "अक्सर पूछे जाने वाले प्रश्न", link: "https://tribal.nic.in/downloads/FRA/FAQ/FAQ Booklet Hindi_Approved.pdf", icon: <HelpCircle size={18} className="text-gray-500" /> },
+  { title: "GED-1: CFR Guidelines", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED- 1 Guidelines for Conservation, Management and Sustainable use of Community Forest Resources(CFR).pdf", icon: <ClipboardList size={22} className="text-blue-500" /> },
+  { title: "GED-15: Rejection Reasons", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-15 Reason of Rejection dated 15.07.2010.pdf", icon: <ClipboardList size={22} className="text-blue-500" /> },
+  { title: "GED-25: Implementation Guidelines", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-25 FRA implementation Guidelines dated 12.07.2012.pdf", icon: <ClipboardList size={22} className="text-blue-500" /> },
+  { title: "GED-28: Geo-referencing Guide", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-28 Guidelines for geo-referencing and Potentiality mapping_27.07.2015.pdf", icon: <Map size={18} className="text-blue-500" /> },
+  { title: "Draft SLMC Report", type: "Report", link: "https://tribal.nic.in/downloads/FRA/Draft_Report06012021.pdf", icon: <BarChart size={18} className="text-indigo-500" /> },
+  { title: "GED-16: SLMC Monitoring", type: "Directive", link: "https://tribal.nic.in/downloads/FRA/General executive direction/GED-16 Monitoring with SLMC  - letter dated 20.07.2010.pdf", icon: <ClipboardList size={22} className="text-blue-500" /> },
 ];
 
 const FRA_STATS = [
@@ -113,7 +114,7 @@ const ROLES = [
     id: "sdlc_officer" as const,
     title: "SDLC Field Officer",
     titleHi: "एसडीएलसी क्षेत्र अधिकारी",
-    icon: "📋",
+    icon: <ClipboardList size={22} className="text-blue-500" />,
     desc: "Access the field verification queue. Process incomplete records, generate Patwari survey batches and GPS checklists for your sub-division.",
     descHi: "क्षेत्र सत्यापन कतार देखें। पटवारी सर्वेक्षण बैच और जीपीएस चेकलिस्ट तैयार करें।",
     badge: "Sub-Divisional Level Committee",
@@ -124,7 +125,7 @@ const ROLES = [
     id: "dlc_magistrate" as const,
     title: "District Magistrate",
     titleHi: "जिला दंडाधिकारी",
-    icon: "⚖️",
+    icon: <Scale size={22} className="text-indigo-500" />,
     desc: "Monitor statutory deadlines district-wide. Resolve land conflicts, issue Rule 12(2) directives and Joint Cadastral Inspection orders.",
     descHi: "जिले में वैधानिक समयसीमाओं की निगरानी करें। भूमि विवाद सुलझाएं, नियम 12(2) निर्देश जारी करें।",
     badge: "District Level Committee",
@@ -135,7 +136,7 @@ const ROLES = [
     id: "state_secretary" as const,
     title: "State Tribal Secretary",
     titleHi: "राज्य जनजातीय सचिव",
-    icon: "🏛️",
+    icon: <Landmark size={22} className="text-red-500" />,
     desc: "Review state-wide clearance rates, mandate special SDLC sittings, and identify systemic suppression in affected districts.",
     descHi: "राज्यव्यापी निकासी दरों की समीक्षा करें, विशेष एसडीएलसी बैठकें निर्धारित करें।",
     badge: "State Level Monitoring Committee",
@@ -145,12 +146,12 @@ const ROLES = [
 ];
 
 const STATES = [
-  { name: "Chhattisgarh", flag: "🌳", district: "Bastar" },
-  { name: "Jharkhand", flag: "🌿", district: "Khunti" },
-  { name: "Madhya Pradesh", flag: "🌾", district: "Mandla" },
-  { name: "Maharashtra", flag: "🏞️", district: "Gadchiroli" },
-  { name: "Odisha", flag: "🏔️", district: "Koraput" },
-  { name: "West Bengal", flag: "🌄", district: "Purulia" },
+  { name: "Chhattisgarh", flag: <Trees size={22} className="text-green-600" />, district: "Bastar" },
+  { name: "Jharkhand", flag: <Trees size={22} className="text-green-600" />, district: "Khunti" },
+  { name: "Madhya Pradesh", flag: <Wheat size={48} className="mx-auto text-amber-500" />, district: "Mandla" },
+  { name: "Maharashtra", flag: <Mountain size={48} className="mx-auto text-gray-400" />, district: "Gadchiroli" },
+  { name: "Odisha", flag: <Mountain size={48} className="mx-auto text-gray-400" />, district: "Koraput" },
+  { name: "West Bengal", flag: <Mountain size={32} className="text-blue-200" />, district: "Purulia" },
 ];
 
 type LoginStep = "role" | "state" | "credentials";
@@ -278,7 +279,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
       <header style={{ background: "white", borderBottom: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#e8edf5", border: "2px solid #1e3a5f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, flexShrink: 0 }}>🇮🇳</div>
+            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#e8edf5", border: "2px solid #1e3a5f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, flexShrink: 0 }}></div>
             <div>
               <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>जनजातीय कार्य मंत्रालय</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#1e3a5f", lineHeight: 1.1 }}>{t("MINISTRY OF TRIBAL AFFAIRS", isHindi)}</div>
@@ -414,7 +415,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#1e5fa4"; (e.currentTarget as HTMLElement).style.background = "#f0f7ff"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e5e7eb"; (e.currentTarget as HTMLElement).style.background = "#fafafa"; }}
               >
-                <div style={{ width: 44, height: 44, borderRadius: 8, background: "#e8edf5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📅</div>
+                <div style={{ width: 44, height: 44, borderRadius: 8, background: "#e8edf5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><Calendar size={14} className="inline mr-2 text-blue-500" /></div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                     <span style={{ fontSize: 10, fontWeight: 700, color: "#1e5fa4", background: "#eff6ff", padding: "2px 8px", borderRadius: 20 }}>{m.type}</span>
@@ -577,7 +578,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#1e5fa4"; (e.currentTarget as HTMLElement).style.background = "#f0f7ff"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e5e7eb"; (e.currentTarget as HTMLElement).style.background = "#fafafa"; }}
               >
-                <div style={{ width: 44, height: 44, borderRadius: 8, background: "#e8edf5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📅</div>
+                <div style={{ width: 44, height: 44, borderRadius: 8, background: "#e8edf5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><Calendar size={14} className="inline mr-2 text-blue-500" /></div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                     <span style={{ fontSize: 10, fontWeight: 700, color: "#1e5fa4", background: "#eff6ff", padding: "2px 8px", borderRadius: 20 }}>{m.type}</span>
@@ -639,7 +640,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
                 <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>{c.designation}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
-                    <span>📞</span>
+                    <span><Phone size={14} className="inline mr-2 text-green-600" /></span>
                     <a href={`tel:${c.phone.replace(/[^0-9]/g, "")}`} style={{ color: "#1e5fa4", fontWeight: 600, textDecoration: "none" }}>{c.phone}</a>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#4b5563" }}>
@@ -647,7 +648,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
                     <span>{c.email}</span>
                   </div>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
-                    <span>📍</span>
+                    <span><MapPin size={14} className="inline mr-2 text-red-500" /></span>
                     <span>{c.addr}</span>
                   </div>
                 </div>
@@ -811,7 +812,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
             )}
 
             <div style={{ background: "#f9fafb", borderTop: "1px solid #e5e7eb", padding: "10px 24px", textAlign: "center", fontSize: 11, color: "#9ca3af" }}>
-              🔒 This system is for authorized Government of India officials only. All access is logged and audited under the IT Act, 2000.
+              <Lock size={16} className="inline mr-2 text-gray-500" /> This system is for authorized Government of India officials only. All access is logged and audited under the IT Act, 2000.
             </div>
           </div>
         </div>

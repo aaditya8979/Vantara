@@ -1,13 +1,14 @@
 /* ─── VANTARA — Applicant Portal (Light Theme / NIC Standard) */
 
-import { useState } from "react";
+import { useState, ReactNode } from "react";
+import { ArrowRight, Search, Home, ClipboardList, Landmark, ScrollText, Check, X, Hourglass, FileText, Leaf } from "lucide-react";
 import type { ApplicantView } from "../types";
 
-const STAGE_ICONS: Record<string, string> = {
-  GRAM_SABHA: "🏘️",
-  SDLC: "📋",
-  DLC: "🏛️",
-  TITLE_ISSUED: "📜",
+const STAGE_ICONS: Record<string, ReactNode> = {
+  GRAM_SABHA: <Home size={16} />,
+  SDLC: <ClipboardList size={16} />,
+  DLC: <Landmark size={16} />,
+  TITLE_ISSUED: <ScrollText size={16} />,
 };
 
 export default function ApplicantPortal() {
@@ -138,11 +139,13 @@ export default function ApplicantPortal() {
                         : "bg-amber-500"
                     }`}
                   >
-                    {data.current_status.includes("Title")
-                      ? "✓"
-                      : data.current_status.includes("Rejected")
-                      ? "✕"
-                      : "⏳"}
+                    <div className="font-bold flex items-center justify-center">
+                      {data.current_status.includes("Title")
+                        ? <Check size={24} className="text-white" /> 
+                        : data.current_status.includes("Rejected")
+                        ? <X size={24} className="text-white" /> 
+                        : <Hourglass size={24} className="text-white" />}
+                    </div>
                   </div>
                   <div>
                     <div className="text-base font-bold text-gray-900">
@@ -172,7 +175,7 @@ export default function ApplicantPortal() {
                       return (
                         <div key={i} className="flex gap-4 relative">
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center z-10 flex-shrink-0 text-lg ${
+                            className={`w-10 h-10 rounded-full flex items-center justify-center z-10 flex-shrink-0 text-white ${
                               isComplete
                                 ? "bg-green-600"
                                 : isActive
@@ -180,7 +183,9 @@ export default function ApplicantPortal() {
                                 : "bg-gray-300"
                             }`}
                           >
-                            {STAGE_ICONS[step.stage] || "📄"}
+                            <span className="text-xl">
+                              {STAGE_ICONS[step.stage] || <FileText size={16} />}
+                            </span>
                           </div>
 
                           <div className="flex-1">
@@ -231,7 +236,7 @@ export default function ApplicantPortal() {
           {/* Empty State */}
           {!data && !loading && !error && (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">🌿</div>
+              <div className="mb-4 flex justify-center text-green-700"><Leaf size={60} /></div>
               <h3 className="text-lg text-gray-600 font-medium mb-2">
                 Enter your Claim ID above
               </h3>

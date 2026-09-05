@@ -2,6 +2,7 @@
 /* Enhanced: Capacity & Conflict Engine • All-state Coverage   */
 
 import { useEffect, useState } from "react";
+import { ArrowLeft, ChevronDown, Download, FileText, Globe, Search, CircleAlert, Scale, Ruler, Timer, BrainCircuit, ClipboardList, CheckCircle, BarChart } from "lucide-react";
 import { fetchStateMatrix } from "../api";
 
 interface DistrictCapacity {
@@ -141,7 +142,7 @@ export default function StateSecretaryDashboard({ onLogout, activeState = "Jhark
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {systemicCount > 0 && (
               <div style={{ background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.5)", borderRadius: 8, padding: "4px 12px", fontSize: 11, color: "#fca5a5", fontWeight: 600 }}>
-                🔴 {systemicCount} SYSTEMIC districts
+                <CircleAlert size={16} className="inline mr-1" /> {systemicCount} SYSTEMIC districts
               </div>
             )}
             <button id="tour-switch-role" onClick={onLogout} style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 6, padding: "6px 14px", cursor: "pointer" }}>
@@ -318,10 +319,10 @@ export default function StateSecretaryDashboard({ onLogout, activeState = "Jhark
               {/* Anomaly detail */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
                 {[
-                  { label: "Statutory Violations", value: selectedData.statutory_violations, color: "#dc2626", bg: "#fef2f2", border: "#fca5a5", icon: "⚖️" },
-                  { label: "Land Mismatches", value: selectedData.land_mismatches, color: "#d97706", bg: "#fffbeb", border: "#fcd34d", icon: "📐" },
-                  { label: "Avg SDLC Days", value: `${selectedData.avg_stage2_days}d`, color: selectedData.avg_stage2_days > 300 ? "#dc2626" : "#374151", bg: "#f9fafb", border: "#e5e7eb", icon: "⏱️" },
-                  { label: "Anomaly Score", value: selectedData.anomaly_score.toFixed(1), color: selectedData.anomaly_score > 7 ? "#dc2626" : "#374151", bg: "#f9fafb", border: "#e5e7eb", icon: "🧠" },
+                  { label: "Statutory Violations", value: selectedData.statutory_violations, color: "#dc2626", bg: "#fef2f2", border: "#fca5a5", icon: <Scale size={20} /> },
+                  { label: "Land Mismatches", value: selectedData.land_mismatches, color: "#d97706", bg: "#fffbeb", border: "#fcd34d", icon: <Ruler size={20} /> },
+                  { label: "Avg SDLC Days", value: `${selectedData.avg_stage2_days}d`, color: selectedData.avg_stage2_days > 300 ? "#dc2626" : "#374151", bg: "#f9fafb", border: "#e5e7eb", icon: <Timer size={20} /> },
+                  { label: "Anomaly Score", value: selectedData.anomaly_score.toFixed(1), color: selectedData.anomaly_score > 7 ? "#dc2626" : "#374151", bg: "#f9fafb", border: "#e5e7eb", icon: <BrainCircuit size={20} /> },
                 ].map(item => (
                   <div key={item.label} style={{ background: item.bg, border: `1px solid ${item.border}`, borderRadius: 8, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{ fontSize: 20 }}>{item.icon}</span>
@@ -336,7 +337,7 @@ export default function StateSecretaryDashboard({ onLogout, activeState = "Jhark
               {/* Clearance Calculator */}
               <div id="tour-sec-mandate" style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #bfdbfe", borderRadius: 12, padding: 20 }}>
                 <h4 style={{ fontSize: 13, fontWeight: 800, color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 16px" }}>
-                  📋 Mandate Special SDLC Sittings — {selectedData.district}
+                  <ClipboardList size={18} className="inline mr-2" /> Mandate Special SDLC Sittings — {selectedData.district}
                 </h4>
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
@@ -397,7 +398,7 @@ export default function StateSecretaryDashboard({ onLogout, activeState = "Jhark
                           </>
                         ) : (
                           <p style={{ fontSize: 13, color: "#14532d", fontWeight: 700, margin: 0 }}>
-                            ✅ Current capacity is sufficient. No additional sittings required for this timeline.
+                            <CheckCircle size={16} className="inline mr-1 text-green-600" /> Current capacity is sufficient. No additional sittings required for this timeline.
                           </p>
                         )}
                       </div>
@@ -408,7 +409,7 @@ export default function StateSecretaryDashboard({ onLogout, activeState = "Jhark
             </div>
           ) : (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#9ca3af", padding: 40 }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
+              <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}><BarChart size={40} className="text-gray-400" /></div>
               <div style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>Select a district from the matrix</div>
               <div style={{ fontSize: 12, marginTop: 4 }}>The clearance calculator and enforcement tools will appear here</div>
             </div>
