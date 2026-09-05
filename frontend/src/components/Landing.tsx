@@ -391,56 +391,7 @@ export default function Landing({ onRoleSelect }: LandingProps) {
         </div>
       </div>
 
-      {/* ── Progress Report Section ── */}
-      <section id="section-progress" style={{ background: "#f0f7ff", borderTop: "3px solid #1e5fa4", borderBottom: "1px solid #bfdbfe", padding: "32px 0" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 4, height: 24, background: "#1e5fa4", borderRadius: 2 }} />
-              <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>
-                {t("Progress Report", isHindi)} — State-wise FRA Implementation (March 2023)
-              </h2>
-            </div>
-            <a href="https://tribal.nic.in/FRA.aspx" target="_blank" rel="noopener" style={{ fontSize: 12, color: "#1e5fa4", fontWeight: 600, textDecoration: "none", border: "1px solid #bfdbfe", borderRadius: 4, padding: "4px 12px", background: "white" }}>
-              View Full MoTA Report ↗
-            </a>
-          </div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", background: "white", borderRadius: 8, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.08)", fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: "#1e3a5f", color: "white" }}>
-                  {["#", "State", "Claims Filed", "Titles Given", "Rejected", "Pending", "Settlement %"].map((h) => (
-                    <th key={h} style={{ padding: "10px 14px", textAlign: h === "#" || h === "Settlement %" ? "center" : "left", fontWeight: 600, fontSize: 12 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {STATE_PROGRESS.map((row, idx) => (
-                  <tr key={row.state} style={{ background: idx % 2 === 0 ? "white" : "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    <td style={{ padding: "9px 14px", textAlign: "center", color: "#6b7280", fontWeight: 600 }}>{idx + 1}</td>
-                    <td style={{ padding: "9px 14px", fontWeight: 700, color: "#1e3a5f" }}>{row.state}</td>
-                    <td style={{ padding: "9px 14px", fontFamily: "monospace" }}>{row.filed}</td>
-                    <td style={{ padding: "9px 14px", fontFamily: "monospace", color: "#15803d", fontWeight: 600 }}>{row.approved}</td>
-                    <td style={{ padding: "9px 14px", fontFamily: "monospace", color: "#b91c1c" }}>{row.rejected}</td>
-                    <td style={{ padding: "9px 14px", fontFamily: "monospace", color: "#d97706" }}>{row.pending}</td>
-                    <td style={{ padding: "9px 14px", textAlign: "center" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <div style={{ flex: 1, height: 8, background: "#e5e7eb", borderRadius: 4, overflow: "hidden" }}>
-                          <div style={{ height: "100%", width: `${row.pct}%`, background: row.pct > 75 ? "#16a34a" : row.pct > 50 ? "#d97706" : "#dc2626", borderRadius: 4 }} />
-                        </div>
-                        <span style={{ fontWeight: 700, fontSize: 12, color: row.pct > 75 ? "#15803d" : row.pct > 50 ? "#b45309" : "#b91c1c", minWidth: 36 }}>{row.pct}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div style={{ marginTop: 10, fontSize: 11, color: "#6b7280" }}>
-            Source: MoTA Monthly Progress Report, March 2023. Data reflects cumulative figures from FRA implementation inception.
-          </div>
-        </div>
-      </section>
+
 
       {/* ── Review Meeting Section ── */}
       <section id="section-meeting" style={{ background: "white", borderBottom: "1px solid #e5e7eb", padding: "32px 0" }}>
@@ -652,6 +603,57 @@ export default function Landing({ onRoleSelect }: LandingProps) {
             style={{ background: "#b91c1c", color: "white", border: "none", borderRadius: 8, padding: "12px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
             {t("Proceed to Officer Login →", isHindi)}
           </button>
+        </div>
+      </section>
+
+      {/* ── Contact Us ── */}
+      <section id="section-contact" style={{ background: "#f9fafb", borderBottom: "1px solid #e5e7eb", padding: "32px 0" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+            <div style={{ width: 4, height: 24, background: "#15803d", borderRadius: 2 }} />
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1e3a5f", margin: 0 }}>
+              {t("Contact Us", isHindi)} — Ministry of Tribal Affairs
+            </h2>
+          </div>
+          {/* Address block */}
+          <div style={{ background: "#1e3a5f", color: "white", borderRadius: 8, padding: "16px 20px", marginBottom: 16, display: "flex", gap: 32, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 12, color: "#93c5fd", marginBottom: 4, fontWeight: 600 }}>POSTAL ADDRESS</div>
+              <div style={{ fontSize: 13, lineHeight: 1.7 }}>Ministry of Tribal Affairs<br />Jeevan Tara Building, Gate No. 5<br />Ashoka Road, Patel Chowk<br />New Delhi — 110001</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, color: "#93c5fd", marginBottom: 4, fontWeight: 600 }}>TOLL-FREE HELPLINE</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#fde68a" }}>1800-11-2001</div>
+              <div style={{ fontSize: 11, color: "#93c5fd" }}>Mon – Fri, 9:00 AM – 6:00 PM</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, color: "#93c5fd", marginBottom: 4, fontWeight: 600 }}>VANTARA SYSTEM HELPDESK</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "white" }}>011-24013698</div>
+              <div style={{ fontSize: 11, color: "#93c5fd" }}>For technical issues with this portal</div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+            {CONTACTS.map((c) => (
+              <div key={c.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 8, padding: "14px 16px" }}>
+                <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 2 }}>{c.name}</div>
+                <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>{c.designation}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+                    <span>📞</span>
+                    <a href={`tel:${c.phone.replace(/[^0-9]/g, "")}`} style={{ color: "#1e5fa4", fontWeight: 600, textDecoration: "none" }}>{c.phone}</a>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#4b5563" }}>
+                    <span>✉️</span>
+                    <span>{c.email}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
+                    <span>📍</span>
+                    <span>{c.addr}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
