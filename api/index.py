@@ -1,18 +1,21 @@
 """
 VANTARA — FastAPI Backend
 All endpoints for dashboard, claims, geojson, and officer actions.
-Data is loaded once at startup from generated JSON files.
+Data is loaded lazily on first request for Vercel serverless compatibility.
 """
 
 import json
 import os
+import sys
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from _data_generator import save_data
+# Add api directory to Python path for underscore-prefixed module imports
+sys.path.insert(0, os.path.dirname(__file__))
+
 from _anomaly_engine import run_anomaly_engine
 
 # ─── Initialize ──────────────────────────────────────────────────────
@@ -29,41 +32,59 @@ app.add_middleware(
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
-# Global data stores (loaded at startup)
+# Global data stores (loaded lazily on first request)
 CLAIMS: list[dict] = []
 DISTRICTS: list[dict] = []
 CLAIMS_INDEX: dict[str, dict] = {}  # claim_id -> claim
+_DATA_LOADED = False
 
 
 def load_or_generate_data():
-    """Load data from JSON files, generating if they don't exist."""
-    global CLAIMS, DISTRICTS, CLAIMS_INDEX
+    """Load data from JSON files, or generate in-memory if not found."""
+    global CLAIMS, DISTRICTS, CLAIMS_INDEX, _DATA_LOADED
+
+    if _DATA_LOADED:
+        return
 
     claims_path = os.path.join(DATA_DIR, "claims.json")
     districts_path = os.path.join(DATA_DIR, "districts.json")
 
-    if not os.path.exists(claims_path) or not os.path.exists(districts_path):
-        print("Data files not found. Generating in-memory...")
+    try:
+        if os.path.exists(claims_path) and os.path.exists(districts_path):
+            with open(claims_path, "r") as f:
+                CLAIMS = json.load(f)
+            with open(districts_path, "r") as f:
+                DISTRICTS = json.load(f)
+            print(f"Loaded data from files: {len(CLAIMS)} claims")
+        else:
+            print("Data files not found. Generating in-memory...")
+            from _data_generator import generate_all_data
+            CLAIMS, DISTRICTS = generate_all_data()
+            print(f"Generated in-memory: {len(CLAIMS)} claims")
+    except Exception as e:
+        print(f"Error loading from files: {e}. Generating in-memory...")
         from _data_generator import generate_all_data
         CLAIMS, DISTRICTS = generate_all_data()
-    else:
-        with open(claims_path, "r") as f:
-            CLAIMS = json.load(f)
-        with open(districts_path, "r") as f:
-            DISTRICTS = json.load(f)
+        print(f"Generated in-memory: {len(CLAIMS)} claims")
 
     # Run anomaly engine
     CLAIMS, DISTRICTS = run_anomaly_engine(CLAIMS, DISTRICTS)
 
     # Build index
     CLAIMS_INDEX = {c["claim_id"]: c for c in CLAIMS}
+    _DATA_LOADED = True
 
-    print(f"Loaded {len(CLAIMS)} claims, {len(DISTRICTS)} districts")
+    print(f"Ready: {len(CLAIMS)} claims, {len(DISTRICTS)} districts")
 
 
-@app.on_event("startup")
-def startup():
-    load_or_generate_data()
+# Use middleware for lazy loading instead of @app.on_event("startup")
+# because Vercel serverless doesn't reliably fire ASGI lifecycle events
+@app.middleware("http")
+async def ensure_data_loaded(request: Request, call_next):
+    if not _DATA_LOADED:
+        load_or_generate_data()
+    response = await call_next(request)
+    return response
 
 
 # ─── Pydantic Models ─────────────────────────────────────────────────
