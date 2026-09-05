@@ -43,13 +43,14 @@ def load_or_generate_data():
     districts_path = os.path.join(DATA_DIR, "districts.json")
 
     if not os.path.exists(claims_path) or not os.path.exists(districts_path):
-        print("Data files not found. Generating...")
-        save_data()
-
-    with open(claims_path, "r") as f:
-        CLAIMS = json.load(f)
-    with open(districts_path, "r") as f:
-        DISTRICTS = json.load(f)
+        print("Data files not found. Generating in-memory...")
+        from _data_generator import generate_all_data
+        CLAIMS, DISTRICTS = generate_all_data()
+    else:
+        with open(claims_path, "r") as f:
+            CLAIMS = json.load(f)
+        with open(districts_path, "r") as f:
+            DISTRICTS = json.load(f)
 
     # Run anomaly engine
     CLAIMS, DISTRICTS = run_anomaly_engine(CLAIMS, DISTRICTS)
@@ -84,7 +85,7 @@ class OfficerActionResponse(BaseModel):
 
 # ─── Dashboard Endpoints ─────────────────────────────────────────────
 
-@app.get("/dashboard/summary")
+@app.get("/api/dashboard/summary")
 def dashboard_summary(district: Optional[str] = None, state: Optional[str] = None):
     """Aggregate counts across all claims or filtered by district/state."""
     filtered = CLAIMS
@@ -148,7 +149,7 @@ def dashboard_summary(district: Optional[str] = None, state: Optional[str] = Non
 
 # ─── Claims Endpoints ────────────────────────────────────────────────
 
-@app.get("/claims")
+@app.get("/api/claims")
 def get_claims(
     status: Optional[str] = None,
     district: Optional[str] = None,
@@ -211,7 +212,7 @@ def get_claims(
     }
 
 
-@app.get("/claims/{claim_id}")
+@app.get("/api/claims/{claim_id}")
 def get_claim_detail(claim_id: str):
     """Return full claim payload including stage history and anomaly flags."""
     claim = CLAIMS_INDEX.get(claim_id)
@@ -222,7 +223,7 @@ def get_claim_detail(claim_id: str):
 
 # ─── Officer Actions ─────────────────────────────────────────────────
 
-@app.post("/claims/{claim_id}/actions")
+@app.post("/api/claims/{claim_id}/actions")
 def add_officer_action(claim_id: str, action: OfficerActionRequest):
     """Append an officer action to a claim's audit trail."""
     claim = CLAIMS_INDEX.get(claim_id)
