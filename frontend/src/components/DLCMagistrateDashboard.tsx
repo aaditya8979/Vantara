@@ -1,13 +1,8 @@
 /* ─── VANTARA — DLC Magistrate Dashboard ─────────────────── */
-/* Role 2: Legal Enforcement Engine for Violations            */
+/* Enhanced: Legal Enforcement Engine • All-state Leaflet Map  */
 
 import { useEffect, useState, useRef } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  CircleMarker,
-  Tooltip,
-} from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchDLCViolations, fetchDistrictGeoJSON } from "../api";
 import type { DistrictGeoJSON } from "../types";
@@ -45,7 +40,20 @@ interface DLCMagistrateProps {
   activeState?: string;
 }
 
-export default function DLCMagistrateDashboard({ onLogout, activeDistrict = "Bastar", activeState = "Chhattisgarh" }: DLCMagistrateProps) {
+// State metadata: map center, default district, IAS officer title
+const STATE_META: Record<string, { center: [number, number]; zoom: number; district: string; stateCode: string }> = {
+  Jharkhand:        { center: [23.6, 85.3],  zoom: 7,  district: "Khunti",      stateCode: "JH" },
+  Chhattisgarh:     { center: [20.5, 81.7],  zoom: 7,  district: "Bastar",      stateCode: "CG" },
+  "Madhya Pradesh": { center: [22.9, 78.7],  zoom: 7,  district: "Mandla",      stateCode: "MP" },
+  Maharashtra:      { center: [19.7, 79.3],  zoom: 7,  district: "Gadchiroli",  stateCode: "MH" },
+  Odisha:           { center: [19.8, 83.0],  zoom: 7,  district: "Koraput",     stateCode: "OD" },
+  "West Bengal":    { center: [23.0, 86.4],  zoom: 7,  district: "Purulia",     stateCode: "WB" },
+};
+
+export default function DLCMagistrateDashboard({ onLogout, activeDistrict, activeState = "Chhattisgarh" }: DLCMagistrateProps) {
+  const meta = STATE_META[activeState] ?? STATE_META["Chhattisgarh"];
+  const district = activeDistrict ?? meta.district;
+
   const [data, setData] = useState<ViolationResponse | null>(null);
   const [geojson, setGeojson] = useState<DistrictGeoJSON | null>(null);
   const [page, setPage] = useState(1);
@@ -54,280 +62,287 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict = "Bas
   const [showDirective, setShowDirective] = useState(false);
   const [directiveType, setDirectiveType] = useState<"rule12" | "cadastral">("rule12");
   const [directiveClaims, setDirectiveClaims] = useState<ViolationClaim[]>([]);
+  const [mapView, setMapView] = useState<"state" | "all">("state");
   const printRef = useRef<HTMLDivElement>(null);
+  const refNo = useRef(`VANTARA/DLC/${meta.stateCode}/${new Date().getFullYear()}/SD-${String(Math.floor(Math.random() * 900) + 100)}`);
 
-  useEffect(() => {
-    fetchDistrictGeoJSON().then(setGeojson);
-  }, []);
+  useEffect(() => { fetchDistrictGeoJSON().then(setGeojson); }, []);
 
   useEffect(() => {
     setLoading(true);
-    fetchDLCViolations({
-      district: "Bastar",
-      violation_type: filterType,
-      page,
-      page_size: 30,
-    }).then((d) => {
-      setData(d);
-      setLoading(false);
-    });
-  }, [page, filterType]);
+    fetchDLCViolations({ district: district, violation_type: filterType, page, page_size: 30 })
+      .then((d) => { setData(d); setLoading(false); });
+  }, [page, filterType, district]);
 
   const openDirective = (type: "rule12" | "cadastral", claims: ViolationClaim[]) => {
-    setDirectiveType(type);
-    setDirectiveClaims(claims);
-    setShowDirective(true);
+    setDirectiveType(type); setDirectiveClaims(claims); setShowDirective(true);
   };
 
   const handlePrint = () => {
     if (!printRef.current) return;
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    printWindow.document.write(`
-      <html><head><title>VANTARA — Statutory Directive</title>
-      <style>
-        body { font-family: 'Inter', Arial, sans-serif; padding: 32px; color: #111; max-width: 800px; margin: 0 auto; }
-        h1 { font-size: 18px; text-align: center; margin-bottom: 4px; text-transform: uppercase; }
-        h2 { font-size: 14px; text-align: center; color: #444; margin-bottom: 20px; }
-        .ref { font-size: 11px; color: #666; margin-bottom: 16px; }
-        .body-text { font-size: 13px; line-height: 1.8; margin-bottom: 16px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 16px 0; }
-        th { background: #f3f4f6; text-align: left; padding: 8px; border: 1px solid #ccc; font-weight: 600; }
-        td { padding: 8px; border: 1px solid #ccc; }
-        tr:nth-child(even) { background: #f9fafb; }
-        .sig { margin-top: 40px; font-size: 12px; }
-        .notice { background: #fef2f2; border: 1px solid #fca5a5; padding: 12px; border-radius: 4px; margin: 16px 0; font-size: 12px; color: #991b1b; }
-      </style></head><body>
-      ${printRef.current.innerHTML}
-      <script>window.print();</script>
-      </body></html>
-    `);
-    printWindow.document.close();
+    const w = window.open("", "_blank"); if (!w) return;
+    w.document.write(`<html><head><title>VANTARA — Statutory Directive</title>
+      <style>body{font-family:'Inter',Arial,sans-serif;padding:32px;color:#111;max-width:800px;margin:0 auto}
+      h1{font-size:18px;text-align:center;margin-bottom:4px;text-transform:uppercase}
+      h2{font-size:14px;text-align:center;color:#444;margin-bottom:20px}
+      table{width:100%;border-collapse:collapse;font-size:11px;margin:16px 0}
+      th{background:#f3f4f6;text-align:left;padding:8px;border:1px solid #ccc;font-weight:600}
+      td{padding:8px;border:1px solid #ccc}tr:nth-child(even){background:#f9fafb}
+      .notice{background:#fef2f2;border:1px solid #fca5a5;padding:12px;border-radius:4px;margin:16px 0;font-size:12px;color:#991b1b}
+      </style></head><body>${printRef.current.innerHTML}<script>window.print();</script></body></html>`);
+    w.document.close();
   };
 
-  // Get statutory violations for bulk directive
-  const statutoryClaims = data?.claims.filter((c) =>
-    c.anomaly_types.includes("STATUTORY_VIOLATION")
-  ) || [];
-  const landClaims = data?.claims.filter((c) =>
-    c.anomaly_types.includes("LAND_MISMATCH")
-  ) || [];
+  const statutoryClaims = data?.claims.filter(c => c.anomaly_types.includes("STATUTORY_VIOLATION")) || [];
+  const landClaims = data?.claims.filter(c => c.anomaly_types.includes("LAND_MISMATCH")) || [];
+
+  // Determine which features to show on map
+  const mapFeatures = geojson?.features.filter(f =>
+    mapView === "all" ? true : f.properties.state === activeState
+  ) ?? [];
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <header className="h-14 bg-[#1e3a5f] flex items-center justify-between px-5 flex-shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#1e3a5f] font-bold text-sm">V</div>
-          <div>
-            <h1 className="text-sm font-bold text-white">District Magistrate — DLC Chairperson, Bastar</h1>
-            <p className="text-[10px] text-blue-200">Legal Enforcement Engine • Statutory Violations & Land Conflicts</p>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "#f8fafc", fontFamily: "'Inter', system-ui, sans-serif" }}>
+
+      {/* ── Premium Header ── */}
+      <header style={{ background: "linear-gradient(135deg, #7f1d1d 0%, #b91c1c 60%, #dc2626 100%)", flexShrink: 0, boxShadow: "0 2px 12px rgba(0,0,0,0.25)" }}>
+        <div style={{ padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <img src="/vantara-logo.png" alt="V" style={{ width: 36, height: 36, borderRadius: 8, objectFit: "contain", background: "white", padding: 3, border: "2px solid rgba(255,255,255,0.3)" }} />
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <h1 style={{ fontSize: 14, fontWeight: 700, color: "white", margin: 0 }}>
+                  District Magistrate — DLC Chairperson, {district}
+                </h1>
+                <span style={{ fontSize: 10, background: "#fbbf24", color: "#7c2d12", padding: "2px 8px", borderRadius: 20, fontWeight: 700, letterSpacing: "0.05em" }}>ENFORCEMENT</span>
+              </div>
+              <p style={{ fontSize: 11, color: "#fca5a5", margin: 0 }}>Legal Enforcement Engine • Statutory Violations & Land Conflicts • {activeState}</p>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {data && data.stats.statutory_violations > 0 && (
+              <div style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 8, padding: "4px 12px", fontSize: 11, color: "white", fontWeight: 600 }}>
+                ⚖️ {data.stats.statutory_violations} Rule 12(2) Breaches
+              </div>
+            )}
+            <button id="tour-switch-role" onClick={onLogout} style={{ fontSize: 12, color: "#fca5a5", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 6, padding: "6px 14px", cursor: "pointer" }}>
+              ← Switch Role
+            </button>
           </div>
         </div>
-        <button onClick={onLogout} className="text-xs text-blue-200 hover:text-white border border-blue-300/30 px-3 py-1.5 rounded transition-colors">
-          ← Switch Role
-        </button>
+
+        {/* KPI strip inside header */}
+        {data && (
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.15)", padding: "8px 20px", display: "flex", gap: 24 }}>
+            {[
+              { label: "Total Flagged", value: data.total, color: "white" },
+              { label: "Statutory Violations", value: data.stats.statutory_violations, color: "#fde68a" },
+              { label: "Land Mismatches", value: data.stats.land_mismatches, color: "#fed7aa" },
+              { label: "Rule 12(2) Breaches (60+ days)", value: data.claims.filter(c => c.days_in_current_stage > 60).length, color: "#fca5a5" },
+            ].map(kpi => (
+              <div key={kpi.label} style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                <span style={{ fontSize: 20, fontWeight: 800, color: kpi.color }}>{kpi.value}</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>{kpi.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left: Map */}
-        <div className="w-[45%] border-r border-gray-200 relative">
+      {/* ── Main Split Layout ── */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+
+        {/* ── LEFT: Leaflet Map ── */}
+        <div style={{ width: "44%", position: "relative", borderRight: "1px solid #e5e7eb" }}>
+          {/* Map controls */}
+          <div style={{ position: "absolute", top: 10, right: 10, zIndex: 1000, display: "flex", flexDirection: "column", gap: 4 }}>
+            {[
+              { id: "state" as const, label: `${activeState} Only` },
+              { id: "all" as const, label: "All States" },
+            ].map(v => (
+              <button key={v.id} onClick={() => setMapView(v.id)}
+                style={{ fontSize: 11, fontWeight: 600, padding: "5px 10px", borderRadius: 6, border: "1px solid #d1d5db", cursor: "pointer", background: mapView === v.id ? "#1e3a5f" : "white", color: mapView === v.id ? "white" : "#374151", boxShadow: "0 1px 4px rgba(0,0,0,0.1)" }}>
+                {v.label}
+              </button>
+            ))}
+          </div>
+
           <MapContainer
-            center={[19.1, 81.95]}
-            zoom={8}
-            className="h-full w-full"
-            style={{ background: "#f3f4f6" }}
+            key={`${activeState}-${mapView}`}
+            center={mapView === "all" ? [22.5, 82.0] : meta.center}
+            zoom={mapView === "all" ? 5 : meta.zoom}
+            style={{ height: "100%", width: "100%", background: "#f0f4f8" }}
           >
             <TileLayer
               attribution='&copy; <a href="https://carto.com/">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             />
-            {geojson?.features
-              .filter((f) => f.properties.state === "Chhattisgarh")
-              .map((feature) => {
-                const p = feature.properties;
-                const coords = feature.geometry.coordinates;
-                const isBastar = p.district === "Bastar";
-                return (
-                  <CircleMarker
-                    key={p.district}
-                    center={[coords[1], coords[0]]}
-                    radius={isBastar ? 18 : 10}
-                    pathOptions={{
-                      color: isBastar ? "#1e3a5f" : "#9ca3af",
-                      fillColor: isBastar
-                        ? p.statutory_violations > 0 ? "#b91c1c" : "#15803d"
-                        : "#d1d5db",
-                      fillOpacity: isBastar ? 0.8 : 0.4,
-                      weight: isBastar ? 3 : 1,
-                    }}
-                  >
-                    <Tooltip>
-                      <div className="text-xs">
-                        <div className="font-semibold text-gray-900">{p.district}</div>
-                        <div className="text-gray-500">{p.state}</div>
-                        <div className="mt-1">
-                          Violations: <span className="text-red-700 font-semibold">{p.statutory_violations}</span>
-                          {" • "}Settlement: {p.settlement_pct}%
-                        </div>
+            {mapFeatures.map((feature) => {
+              const p = feature.properties;
+              const coords = feature.geometry.coordinates;
+              const isActive = p.district === district;
+              const hasViolations = (p.statutory_violations ?? 0) > 0;
+              const settlementPct = p.settlement_pct ?? 50;
+
+              // Color coding: red = violations, amber = low settlement, green = healthy
+              const fillColor = hasViolations
+                ? "#dc2626"
+                : settlementPct < 40
+                ? "#d97706"
+                : "#16a34a";
+
+              return (
+                <CircleMarker
+                  key={`${p.state}-${p.district}`}
+                  center={[coords[1], coords[0]]}
+                  radius={isActive ? 16 : 8}
+                  pathOptions={{
+                    color: isActive ? "#1e3a5f" : "white",
+                    fillColor,
+                    fillOpacity: isActive ? 0.9 : 0.75,
+                    weight: isActive ? 3 : 1.5,
+                  }}
+                >
+                  <Tooltip direction="top" offset={[0, -8]}>
+                    <div style={{ fontSize: 12, minWidth: 140 }}>
+                      <div style={{ fontWeight: 700, color: "#111", marginBottom: 4 }}>{p.district}</div>
+                      <div style={{ color: "#6b7280", fontSize: 11 }}>{p.state}</div>
+                      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 2 }}>
+                        <div>Violations: <span style={{ color: "#dc2626", fontWeight: 700 }}>{p.statutory_violations ?? 0}</span></div>
+                        <div>Settlement: <span style={{ color: settlementPct > 60 ? "#15803d" : "#d97706", fontWeight: 700 }}>{settlementPct}%</span></div>
+                        <div>Land Mismatches: <span style={{ fontWeight: 600 }}>{p.land_mismatches ?? 0}</span></div>
                       </div>
-                    </Tooltip>
-                  </CircleMarker>
-                );
-              })}
+                    </div>
+                  </Tooltip>
+                </CircleMarker>
+              );
+            })}
           </MapContainer>
 
-          {/* Map overlay stats */}
-          {data && (
-            <div className="absolute bottom-4 left-4 z-[1000] bg-white rounded-lg p-4 border border-gray-200 shadow-md">
-              <div className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Bastar District</div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <div className="text-xs text-gray-400">Statutory Violations</div>
-                  <div className="text-xl font-bold text-red-700">{data.stats.statutory_violations}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400">Land Mismatches</div>
-                  <div className="text-xl font-bold text-amber-700">{data.stats.land_mismatches}</div>
-                </div>
+          {/* Map legend */}
+          <div style={{ position: "absolute", bottom: 12, left: 12, zIndex: 1000, background: "white", borderRadius: 8, padding: "10px 14px", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", fontSize: 11 }}>
+            <div style={{ fontWeight: 700, color: "#374151", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>District Status</div>
+            {[
+              { color: "#dc2626", label: "Statutory Violations" },
+              { color: "#d97706", label: "Low Settlement (<40%)" },
+              { color: "#16a34a", label: "Healthy (>40%)" },
+            ].map(item => (
+              <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: item.color }} />
+                <span style={{ color: "#6b7280" }}>{item.label}</span>
               </div>
-            </div>
-          )}
+            ))}
+            {data && (
+              <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #e5e7eb" }}>
+                <div style={{ fontWeight: 700, color: "#111827", fontSize: 13 }}>{district}</div>
+                <div style={{ color: "#dc2626", fontWeight: 600 }}>⚖️ {data.stats.statutory_violations} violations</div>
+                <div style={{ color: "#d97706", fontWeight: 600 }}>📐 {data.stats.land_mismatches} land mismatches</div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right: Priority Action Queue */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Action Buttons */}
-          <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 flex-wrap">
-            <div className="flex gap-1">
-              <button
-                onClick={() => { setFilterType(undefined); setPage(1); }}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                  !filterType ? "bg-[#1e3a5f] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                All ({data ? data.total : "..."})
+        {/* ── RIGHT: Priority Action Queue ── */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+          {/* Action toolbar */}
+          <div style={{ background: "white", borderBottom: "1px solid #e5e7eb", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {[
+              { id: undefined, label: `All (${data?.total ?? "..."})`, activeColor: "#1e3a5f" },
+              { id: "STATUTORY_VIOLATION", label: "⚖️ Statutory", activeColor: "#b91c1c" },
+              { id: "LAND_MISMATCH", label: "📐 Land Mismatch", activeColor: "#b45309" },
+            ].map(f => (
+              <button key={String(f.id)} onClick={() => { setFilterType(f.id); setPage(1); }}
+                id={f.id === "STATUTORY_VIOLATION" ? "tour-dlc-filter-stat" : undefined}
+                style={{ fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", background: filterType === f.id ? f.activeColor : "#f3f4f6", color: filterType === f.id ? "white" : "#374151", transition: "all 0.15s" }}>
+                {f.label}
               </button>
-              <button
-                onClick={() => { setFilterType("STATUTORY_VIOLATION"); setPage(1); }}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                  filterType === "STATUTORY_VIOLATION" ? "bg-red-700 text-white" : "bg-red-50 text-red-700 hover:bg-red-100"
-                }`}
-              >
-                ⚖️ Statutory
-              </button>
-              <button
-                onClick={() => { setFilterType("LAND_MISMATCH"); setPage(1); }}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                  filterType === "LAND_MISMATCH" ? "bg-amber-700 text-white" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                }`}
-              >
-                📐 Land Mismatch
-              </button>
-            </div>
-            <div className="flex-1" />
-            <button
-              onClick={() => openDirective("rule12", statutoryClaims)}
-              disabled={statutoryClaims.length === 0}
-              className="text-xs font-medium bg-red-700 hover:bg-red-800 disabled:bg-gray-300 text-white px-3 py-2 rounded-lg transition-colors shadow-sm disabled:cursor-not-allowed"
-            >
-              📜 Generate Rule 12(2) Directive
+            ))}
+            <div style={{ flex: 1 }} />
+            <button onClick={() => openDirective("rule12", statutoryClaims)} disabled={statutoryClaims.length === 0}
+              id="tour-btn-rule12"
+              style={{ fontSize: 12, fontWeight: 600, padding: "7px 14px", borderRadius: 8, border: "none", cursor: statutoryClaims.length > 0 ? "pointer" : "not-allowed", background: statutoryClaims.length > 0 ? "linear-gradient(135deg, #b91c1c, #7f1d1d)" : "#e5e7eb", color: statutoryClaims.length > 0 ? "white" : "#9ca3af", boxShadow: statutoryClaims.length > 0 ? "0 2px 8px rgba(185,28,28,0.35)" : "none", transition: "all 0.2s" }}>
+              📜 Issue Rule 12(2) Directive ({statutoryClaims.length})
             </button>
-            <button
-              onClick={() => openDirective("cadastral", landClaims)}
-              disabled={landClaims.length === 0}
-              className="text-xs font-medium bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 text-white px-3 py-2 rounded-lg transition-colors shadow-sm disabled:cursor-not-allowed"
-            >
-              📐 Trigger Joint Cadastral Inspection
+            <button onClick={() => openDirective("cadastral", landClaims)} disabled={landClaims.length === 0}
+              style={{ fontSize: 12, fontWeight: 600, padding: "7px 14px", borderRadius: 8, border: "none", cursor: landClaims.length > 0 ? "pointer" : "not-allowed", background: landClaims.length > 0 ? "linear-gradient(135deg, #d97706, #b45309)" : "#e5e7eb", color: landClaims.length > 0 ? "white" : "#9ca3af", transition: "all 0.2s" }}>
+              📐 Cadastral Inspection ({landClaims.length})
             </button>
           </div>
 
           {/* Table */}
-          <div className="flex-1 overflow-auto custom-scrollbar">
+          <div id="tour-dlc-summary" style={{ flex: 1, overflow: "auto" }}>
             {loading ? (
-              <div className="p-4 space-y-2">
+              <div style={{ padding: 16 }}>
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
+                  <div key={i} style={{ height: 48, background: "#f3f4f6", borderRadius: 6, marginBottom: 6 }} />
                 ))}
               </div>
             ) : (
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 z-10">
-                  <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
-                    <th className="text-left px-4 py-3 font-semibold">Claim ID</th>
-                    <th className="text-left px-4 py-3 font-semibold">Applicant</th>
-                    <th className="text-left px-4 py-3 font-semibold">Stage</th>
-                    <th className="text-right px-4 py-3 font-semibold">Days Over</th>
-                    <th className="text-right px-4 py-3 font-semibold">Area Gap</th>
-                    <th className="text-left px-4 py-3 font-semibold">Root Cause</th>
-                    <th className="text-center px-4 py-3 font-semibold">Severity</th>
-                    <th className="text-center px-4 py-3 font-semibold">Type</th>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead style={{ position: "sticky", top: 0, zIndex: 10 }}>
+                  <tr style={{ background: "#1e3a5f", color: "white" }}>
+                    {["Claim ID", "Applicant", "Stage", "Days Over", "Area Gap", "Root Cause", "Severity", "Type"].map(h => (
+                      <th key={h} style={{ padding: "10px 12px", textAlign: h === "Days Over" || h === "Area Gap" ? "right" : "left", fontSize: 11, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.claims.map((c, idx) => (
-                    <tr key={c.claim_id} className={`border-b border-gray-100 hover:bg-blue-50 transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/60"}`}>
-                      <td className="px-4 py-3 font-mono text-xs text-blue-700 font-medium">{c.claim_id}</td>
-                      <td className="px-4 py-3 text-gray-800">{c.applicant_name}</td>
-                      <td className="px-4 py-3">
-                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">
-                          {c.current_stage}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {c.days_in_current_stage > 60 ? (
-                          <span className="font-mono text-xs text-red-700 font-bold">
-                            +{c.days_in_current_stage - 60}d
+                  {data?.claims.map((c, idx) => {
+                    const isCritical = c.severity === "CRITICAL";
+                    const isHigh = c.severity === "HIGH";
+                    return (
+                      <tr key={c.claim_id} style={{ background: idx % 2 === 0 ? "white" : "#f9fafb", borderBottom: "1px solid #e5e7eb", borderLeft: `4px solid ${isCritical ? "#dc2626" : isHigh ? "#d97706" : "#e5e7eb"}`, transition: "background 0.1s" }}
+                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#fef2f2"}
+                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = idx % 2 === 0 ? "white" : "#f9fafb"}>
+                        <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 12, color: "#1e5fa4", fontWeight: 600 }}>{c.claim_id}</td>
+                        <td style={{ padding: "10px 12px", color: "#111827", fontWeight: 500, fontSize: 13 }}>{c.applicant_name}</td>
+                        <td style={{ padding: "10px 12px" }}>
+                          <span style={{ fontSize: 11, background: "#f3f4f6", color: "#374151", padding: "3px 8px", borderRadius: 20, fontWeight: 500 }}>
+                            {c.current_stage}
                           </span>
-                        ) : (
-                          <span className="text-xs text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {c.area_mismatch_pct > 10 ? (
-                          <span className="text-xs text-amber-700 font-bold">{c.area_mismatch_pct}%</span>
-                        ) : (
-                          <span className="text-xs text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {c.land_mismatch_root_cause ? (
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium border block truncate max-w-[180px] ${
-                            c.land_mismatch_root_cause.includes("Mining") || c.land_mismatch_root_cause.includes("Eco-Sensitive") || c.land_mismatch_root_cause.includes("Protected") || c.land_mismatch_root_cause.includes("Wildlife") || c.land_mismatch_root_cause.includes("Reserved Forest")
-                              ? "bg-red-50 text-red-700 border-red-200"
-                              : "bg-amber-50 text-amber-700 border-amber-200"
-                          }`} title={c.land_mismatch_root_cause}>
-                            {c.land_mismatch_root_cause.includes("Mining") || c.land_mismatch_root_cause.includes("Eco-Sensitive") || c.land_mismatch_root_cause.includes("Protected") || c.land_mismatch_root_cause.includes("Wildlife") || c.land_mismatch_root_cause.includes("Reserved Forest")
-                              ? "🔴 Structural"
-                              : "🟡 Administrative"}
+                        </td>
+                        <td style={{ padding: "10px 12px", textAlign: "right" }}>
+                          {c.days_in_current_stage > 60 ? (
+                            <span style={{ fontFamily: "monospace", fontSize: 12, color: "#dc2626", fontWeight: 700 }}>+{c.days_in_current_stage - 60}d</span>
+                          ) : <span style={{ color: "#9ca3af", fontSize: 12 }}>—</span>}
+                        </td>
+                        <td style={{ padding: "10px 12px", textAlign: "right" }}>
+                          {c.area_mismatch_pct > 10 ? (
+                            <span style={{ fontSize: 12, color: "#d97706", fontWeight: 700 }}>{c.area_mismatch_pct}%</span>
+                          ) : <span style={{ color: "#9ca3af", fontSize: 12 }}>—</span>}
+                        </td>
+                        <td style={{ padding: "10px 12px", maxWidth: 160 }}>
+                          {c.land_mismatch_root_cause ? (
+                            <span style={{
+                              fontSize: 11, padding: "2px 8px", borderRadius: 20, fontWeight: 500, display: "block",
+                              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                              background: /Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "#fef2f2" : "#fffbeb",
+                              color: /Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "#b91c1c" : "#b45309",
+                              border: `1px solid ${/Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "#fca5a5" : "#fcd34d"}`,
+                            }} title={c.land_mismatch_root_cause}>
+                              {/Mining|Eco-Sensitive|Protected|Wildlife|Reserved Forest/i.test(c.land_mismatch_root_cause) ? "🔴 Structural" : "🟡 Administrative"}
+                            </span>
+                          ) : <span style={{ color: "#d1d5db" }}>—</span>}
+                        </td>
+                        <td style={{ padding: "10px 12px", textAlign: "left" }}>
+                          <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 20, fontWeight: 600, border: "1px solid", background: isCritical ? "#fef2f2" : isHigh ? "#fffbeb" : "#f3f4f6", color: isCritical ? "#dc2626" : isHigh ? "#d97706" : "#6b7280", borderColor: isCritical ? "#fca5a5" : isHigh ? "#fcd34d" : "#e5e7eb" }}>
+                            {c.severity}
                           </span>
-                        ) : (
-                          <span className="text-xs text-gray-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium border ${
-                          c.severity === "CRITICAL"
-                            ? "bg-red-100 text-red-800 border-red-200"
-                            : c.severity === "HIGH"
-                            ? "bg-amber-100 text-amber-800 border-amber-200"
-                            : "bg-gray-100 text-gray-700 border-gray-200"
-                        }`}>
-                          {c.severity}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex justify-center gap-1">
-                          {c.anomaly_types.includes("STATUTORY_VIOLATION") && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-red-600" title="Statutory" />
-                          )}
-                          {c.anomaly_types.includes("LAND_MISMATCH") && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" title="Land" />
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td style={{ padding: "10px 12px" }}>
+                          <div style={{ display: "flex", gap: 4 }}>
+                            {c.anomaly_types.includes("STATUTORY_VIOLATION") && (
+                              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#dc2626", display: "inline-block" }} title="Statutory Violation" />
+                            )}
+                            {c.anomaly_types.includes("LAND_MISMATCH") && (
+                              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#d97706", display: "inline-block" }} title="Land Mismatch" />
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
@@ -335,86 +350,70 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict = "Bas
 
           {/* Pagination */}
           {data && data.total_pages > 1 && (
-            <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between bg-white">
-              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-30 shadow-sm">← Previous</button>
-              <span className="text-xs text-gray-500">Page {data.page} of {data.total_pages}</span>
-              <button disabled={page >= data.total_pages} onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-30 shadow-sm">Next →</button>
+            <div style={{ padding: "10px 16px", borderTop: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", background: "white" }}>
+              <button disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}
+                style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, border: "1px solid #d1d5db", background: "white", cursor: page <= 1 ? "not-allowed" : "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
+                ← Previous
+              </button>
+              <span style={{ fontSize: 12, color: "#6b7280" }}>Page {data.page} of {data.total_pages}</span>
+              <button disabled={page >= data.total_pages} onClick={() => setPage(p => p + 1)}
+                style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, border: "1px solid #d1d5db", background: "white", cursor: page >= data.total_pages ? "not-allowed" : "pointer", opacity: page >= data.total_pages ? 0.4 : 1 }}>
+                Next →
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Directive Modal */}
+      {/* ── Directive Modal ── */}
       {showDirective && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl shadow-2xl w-[850px] max-h-[90vh] flex flex-col border border-gray-200">
-            <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+        <div style={{ position: "fixed", inset: 0, zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.45)" }}>
+          <div style={{ background: "white", borderRadius: 14, boxShadow: "0 24px 64px rgba(0,0,0,0.25)", width: 860, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
+            <div style={{ padding: "16px 24px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fef2f2", borderRadius: "14px 14px 0 0" }}>
               <div>
-                <h3 className="text-base font-bold text-gray-900">
-                  {directiveType === "rule12"
-                    ? "📜 Statutory Directive — FRA Rule 12(2)"
-                    : "📐 Joint Cadastral Inspection Order"
-                  }
+                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#7f1d1d" }}>
+                  {directiveType === "rule12" ? "📜 Statutory Directive — FRA Rule 12(2)" : "📐 Joint Cadastral Inspection Order"}
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {directiveClaims.length} claims • District: Bastar
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#9ca3af" }}>
+                  {directiveClaims.length} claims • {district}, {activeState} • Ref: {refNo.current}
                 </p>
               </div>
-              <div className="flex gap-2">
-                <button onClick={handlePrint} className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm">
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={handlePrint} style={{ fontSize: 12, background: "#b91c1c", color: "white", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600 }}>
                   🖨️ Print / Save PDF
                 </button>
-                <button onClick={() => setShowDirective(false)} className="text-xs bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-lg">
+                <button onClick={() => setShowDirective(false)} style={{ fontSize: 12, background: "white", border: "1px solid #d1d5db", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "#374151" }}>
                   Close
                 </button>
               </div>
             </div>
-
-            <div className="flex-1 overflow-auto p-6" ref={printRef}>
+            <div style={{ flex: 1, overflow: "auto", padding: 28 }} ref={printRef}>
               {directiveType === "rule12" ? (
                 <div>
                   <h1 style={{ fontSize: "18px", fontWeight: "bold", textAlign: "center", marginBottom: "4px", textTransform: "uppercase" }}>
                     Office of the District Magistrate & DLC Chairperson
                   </h1>
                   <h2 style={{ fontSize: "14px", textAlign: "center", color: "#444", marginBottom: "20px" }}>
-                    District Bastar, Chhattisgarh — Statutory Directive Under FRA Rules 2008
+                    District {district}, {activeState} — Statutory Directive Under FRA Rules 2008
                   </h2>
-
-                  <div className="ref" style={{ fontSize: "11px", color: "#666", marginBottom: "12px" }}>
-                    <p>Ref. No.: VANTARA/DLC/BASTAR/{new Date().getFullYear()}/SD-{String(Math.floor(Math.random() * 900) + 100)}</p>
+                  <div style={{ fontSize: "11px", color: "#666", marginBottom: "12px" }}>
+                    <p>Ref. No.: {refNo.current}</p>
                     <p>Date: {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
                   </div>
-
-                  <div className="body-text" style={{ fontSize: "13px", lineHeight: "1.8", marginBottom: "16px" }}>
-                    <p><b>To:</b> The Sub-Divisional Level Committee (SDLC), Bastar Sub-Division</p>
-                    <p style={{ marginTop: "8px" }}>
-                      <b>Subject:</b> Direction under Rule 12(2) of the Scheduled Tribes and Other Traditional Forest Dwellers
-                      (Recognition of Forest Rights) Rules, 2008 — regarding {directiveClaims.length} claims pending beyond the
-                      statutory 60-day processing limit at the SDLC stage.
-                    </p>
-                    <p style={{ marginTop: "12px" }}>
-                      Whereas the District Level Committee (DLC), Bastar has examined the processing records of forest rights claims
-                      under Section 6 of the Forest Rights Act, 2006 and has found that the following {directiveClaims.length} claims
-                      have been pending at the SDLC stage beyond the mandatory 60-day limit prescribed under Rule 12(2):
-                    </p>
+                  <div style={{ fontSize: "13px", lineHeight: "1.8", marginBottom: "16px" }}>
+                    <p><b>To:</b> The Sub-Divisional Level Committee (SDLC), {district} Sub-Division</p>
+                    <p style={{ marginTop: "8px" }}><b>Subject:</b> Direction under Rule 12(2) of the Forest Rights Rules, 2008 — regarding {directiveClaims.length} claims pending beyond the statutory 60-day processing limit at the SDLC stage.</p>
+                    <p style={{ marginTop: "12px" }}>Whereas the District Level Committee (DLC), {district} has examined the processing records of forest rights claims under Section 6 of the Forest Rights Act, 2006 and has found that the following {directiveClaims.length} claims have been pending at the SDLC stage beyond the mandatory 60-day limit:</p>
                   </div>
-
                   <div className="notice" style={{ background: "#fef2f2", border: "1px solid #fca5a5", padding: "12px", borderRadius: "4px", margin: "16px 0", fontSize: "12px", color: "#991b1b" }}>
-                    <b>COMPLIANCE MANDATE:</b> The SDLC is hereby directed to complete verification and forward its recommendations
-                    on ALL listed claims to the DLC within <b>15 calendar days</b> of receipt of this directive, failing which the matter
-                    will be escalated to the State Level Monitoring Committee under Rule 12(4).
+                    <b>COMPLIANCE MANDATE:</b> The SDLC is hereby directed to complete verification and forward its recommendations on ALL listed claims to the DLC within <b>15 calendar days</b> of receipt of this directive, failing which the matter will be escalated to the SLMC under Rule 12(4).
                   </div>
-
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px", margin: "16px 0" }}>
                     <thead>
                       <tr style={{ background: "#f3f4f6" }}>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>S.No.</th>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Claim ID</th>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Applicant</th>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Days at SDLC</th>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Days Over Limit</th>
+                        {["S.No.", "Claim ID", "Applicant", "Days at SDLC", "Days Over Limit"].map(h => (
+                          <th key={h} style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>{h}</th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
@@ -429,45 +428,27 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict = "Bas
                       ))}
                     </tbody>
                   </table>
-                  {directiveClaims.length > 25 && (
-                    <p style={{ fontSize: "11px", color: "#666", fontStyle: "italic" }}>
-                      ... and {directiveClaims.length - 25} additional claims (see full annexure)
-                    </p>
-                  )}
-
-                  <div className="sig" style={{ marginTop: "40px", fontSize: "12px" }}>
+                  {directiveClaims.length > 25 && <p style={{ fontSize: "11px", color: "#666", fontStyle: "italic" }}>... and {directiveClaims.length - 25} additional claims (see full annexure)</p>}
+                  <div style={{ marginTop: "40px", fontSize: "12px" }}>
                     <p><b>Sd/-</b></p>
                     <p>District Magistrate & DLC Chairperson</p>
-                    <p>District Bastar, Chhattisgarh</p>
+                    <p>District {district}, {activeState}</p>
                     <p style={{ marginTop: "16px" }}>Copy to: (1) State Tribal Welfare Department (2) District Tribal Affairs Officer (3) SDLC Member Secretary</p>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <h1 style={{ fontSize: "18px", fontWeight: "bold", textAlign: "center", marginBottom: "4px", textTransform: "uppercase" }}>
-                    Joint Cadastral Inspection Order
-                  </h1>
-                  <h2 style={{ fontSize: "14px", textAlign: "center", color: "#444", marginBottom: "20px" }}>
-                    Revenue & Forest Department — District Bastar
-                  </h2>
-
-                  <div className="body-text" style={{ fontSize: "13px", lineHeight: "1.8", marginBottom: "16px" }}>
-                    <p>
-                      The following {directiveClaims.length} FRA claims show a land area discrepancy exceeding 10% between
-                      the applicant's claimed area and the Revenue/Forest department's recorded area. A joint inspection by
-                      the Patwari (Revenue) and Range Officer (Forest) is hereby ordered under FRA Rules 2008.
-                    </p>
+                  <h1 style={{ fontSize: "18px", fontWeight: "bold", textAlign: "center", marginBottom: "4px", textTransform: "uppercase" }}>Joint Cadastral Inspection Order</h1>
+                  <h2 style={{ fontSize: "14px", textAlign: "center", color: "#444", marginBottom: "20px" }}>Revenue & Forest Department — District {district}, {activeState}</h2>
+                  <div style={{ fontSize: "13px", lineHeight: "1.8", marginBottom: "16px" }}>
+                    <p>The following {directiveClaims.length} FRA claims show a land area discrepancy exceeding 10% between the applicant's claimed area and the Revenue/Forest department's recorded area. A joint inspection by the Patwari (Revenue) and Range Officer (Forest) is hereby ordered under FRA Rules 2008.</p>
                   </div>
-
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px", margin: "16px 0" }}>
                     <thead>
                       <tr style={{ background: "#f3f4f6" }}>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>S.No.</th>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Claim ID</th>
-                        <th style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Applicant</th>
-                        <th style={{ textAlign: "right", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Claimed (ha)</th>
-                        <th style={{ textAlign: "right", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Recorded (ha)</th>
-                        <th style={{ textAlign: "right", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>Discrepancy</th>
+                        {["S.No.", "Claim ID", "Applicant", "Claimed (ha)", "Recorded (ha)", "Discrepancy"].map(h => (
+                          <th key={h} style={{ textAlign: "left", padding: "8px", border: "1px solid #ccc", fontWeight: 600 }}>{h}</th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
@@ -476,17 +457,16 @@ export default function DLCMagistrateDashboard({ onLogout, activeDistrict = "Bas
                           <td style={{ padding: "8px", border: "1px solid #ccc" }}>{i + 1}</td>
                           <td style={{ padding: "8px", border: "1px solid #ccc", fontFamily: "monospace" }}>{c.claim_id}</td>
                           <td style={{ padding: "8px", border: "1px solid #ccc" }}>{c.applicant_name}</td>
-                          <td style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>{c.claimed_area_ha}</td>
-                          <td style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>{c.recorded_area_ha}</td>
-                          <td style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right", color: "#b45309", fontWeight: "bold" }}>{c.area_mismatch_pct}%</td>
+                          <td style={{ padding: "8px", border: "1px solid #ccc" }}>{c.claimed_area_ha}</td>
+                          <td style={{ padding: "8px", border: "1px solid #ccc" }}>{c.recorded_area_ha}</td>
+                          <td style={{ padding: "8px", border: "1px solid #ccc", color: "#b45309", fontWeight: "bold" }}>{c.area_mismatch_pct}%</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-
-                  <div className="sig" style={{ marginTop: "40px", fontSize: "12px" }}>
+                  <div style={{ marginTop: "40px", fontSize: "12px" }}>
                     <p><b>Sd/-</b></p>
-                    <p>District Magistrate & DLC Chairperson, Bastar</p>
+                    <p>District Magistrate & DLC Chairperson, {district}</p>
                     <p style={{ marginTop: "16px" }}>Copy to: (1) District Revenue Officer (2) Divisional Forest Officer (3) SDLC Member Secretary</p>
                   </div>
                 </div>
