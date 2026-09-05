@@ -1,3 +1,5 @@
+<div align="center">
+
 # 🌳 VANTARA
 
 **Verified Anomaly Navigation & Tracking for Adivasi Rights Administration**
@@ -9,90 +11,119 @@
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-VANTARA is an operational intelligence platform designed for government officials to monitor, enforce, and clear bottlenecks in the implementation of the **Forest Rights Act (FRA), 2006**. 
+*An AI-driven operational intelligence platform designed to eliminate bureaucratic stagnation and enforce the Forest Rights Act (FRA), 2006.*
 
-Built with strict adherence to Indian Government (NIC) digital standards, VANTARA moves beyond simple dashboards to provide an **asymmetric, role-based resolution engine** tailored to the specific legal powers of different government tiers.
+[**🚀 View Live Deployment on Vercel**](https://vantara-nakshatra.vercel.app/) • [**📖 Read the Docs**](docs/ARCHITECTURE.md) • [**🐛 Report a Bug**](https://github.com/aaditya8979/Vantara/issues)
 
-## 🚀 Live Demo
-> **[View the Live Deployment on Vercel](https://vantara-nakshatra.vercel.app/)**
+</div>
 
 ---
 
-## 🏗️ Architecture
+## 📖 Executive Summary
 
-VANTARA operates as a decoupled architecture powered by FastAPI on Vercel Serverless Functions and a React Single Page Application (SPA).
+The Forest Rights Act (FRA) of 2006 is a landmark legislation in India, but its implementation is plagued by severe bureaucratic bottlenecks, missing documentation, and systemic land mismatches. 
+
+**VANTARA** is not just another dashboard. It is an **asymmetric, role-based resolution engine**. It strictly adheres to NIC digital standards and mathematically identifies whether a district's failure is due to individual incompetence or systemic, structural breakdowns.
+
+<br/>
+
+## 🏛️ Asymmetric Role-Based Architecture
+
+VANTARA acknowledges that a District Magistrate needs different tools than a State Secretary. The platform bifurcates data based on the statutory powers of the viewer:
 
 ```mermaid
-graph TD
-    User([Government Official]) --> |HTTPS| Frontend[React SPA / Vite]
-    Frontend --> |REST API| API[FastAPI / Vercel Serverless]
-    
-    subgraph "Vercel Serverless Backend"
-        API --> |Reads| Index[index.py / Endpoints]
-        Index --> |Generates in-memory| DataGen[_data_generator.py]
-        DataGen --> |Synthesizes| MockData[(In-Memory Dataset)]
-        Index --> |Detects Bottlenecks| AnomalyEngine[_anomaly_engine.py]
-    end
+mindmap
+  root((VANTARA))
+    SDLC Field Officer
+      Batch Execution Engine
+      Missing GPS / Survey No.
+      Patwari Manifest Generation
+    District Magistrate
+      Rule 12 Compliance Mandates
+      Geospatial Land Mismatches
+      Statutory Violation Enforcer
+    State Secretary
+      AI Systemic Anomaly Scores
+      Capacity & Clearance Calculator
+      Macro Resource Allocation
 ```
 
-For more detailed technical documentation, see the [Architecture Guide](docs/ARCHITECTURE.md).
-
----
-
-## ✨ Core Features: Asymmetric Role-Based Architecture
-
-Rather than showing the same generic data to everyone, VANTARA provides specialized tools for each level of administration:
-
 ### 1. SDLC Field Officer (Administrative Resolution)
-*Focus: Processing incomplete records and field verification.*
+*The Ground Level: High-throughput batch processing.*
 - **Batch Execution Engine**: Instantly filters thousands of claims missing basic fields (Survey Numbers, GPS Coordinates).
 - **Automated Manifests**: Select multiple claims to auto-generate printable Patwari Survey Batches and Gram Sabha GPS Checklists.
-- **High-Density Data**: Clean, tabular interface built for high-throughput batch processing without map distractions.
 
 ### 2. District Magistrate / DLC (Legal Enforcement)
-*Focus: Enforcing statutory deadlines and resolving structural land conflicts.*
+*The Enforcer: Resolving structural land conflicts and delays.*
 - **Geospatial Tracking**: Dedicated Leaflet map locked to the district, highlighting hotspots of statutory violations and land mismatches.
-- **Priority Action Queue**: Identifies claims stuck beyond the 60-day statutory limit or facing severe land area discrepancies.
+- **Priority Action Queue**: Identifies claims stuck beyond the 60-day statutory limit.
 - **One-Click Legal Directives**: Auto-generates official, printable **Rule 12(2) Compliance Mandates**.
 
 ### 3. State Tribal Secretary (Resource Allocation)
-*Focus: Macro-strategy, capacity building, and identifying systemic failures.*
-- **District Performance Matrix**: Ranks districts not just by pending claims, but by an AI-driven **Anomaly Score**.
-- **SDLC Clearance Calculator**: A dynamic tool where the Secretary sets a "Target Clearance" timeline to calculate required processing rates.
+*The Strategist: Macro-strategy, capacity building, and systemic analysis.*
+- **District Performance Matrix**: Ranks districts not just by pending claims, but by a peer-corrected **Anomaly Score** identifying systemic vs. individual bottlenecks.
+- **SDLC Clearance Calculator**: A dynamic tool that calculates required claims-processed-per-month rates to hit target clearance timelines.
 
----
+<br/>
 
-## 📁 Project Structure
+## 🧠 The Anomaly Engine & Synthetic Data
 
-```
-├── api/                        # FastAPI serverless backend (Vercel)
-│   ├── index.py                # Main API entry point & Routing
-│   ├── _anomaly_engine.py      # Deterministic anomaly detection logic
-│   ├── _data_generator.py      # Synthetic data generation logic
-│   └── requirements.txt        # Python dependencies
-├── frontend/                   # React + Vite + TypeScript frontend
-│   ├── src/
-│   │   ├── components/         # React components (Dashboards, Maps, Tables)
-│   │   ├── api.ts              # Centralized API fetch client
-│   │   ├── types.ts            # Shared TypeScript interfaces
-│   │   ├── App.tsx             # Routing configuration
-│   │   └── main.tsx            # React DOM entry point
-│   └── package.json            # Node.js dependencies
-├── docs/                       # Project Documentation
-├── .github/workflows/          # CI/CD Pipelines
-└── vercel.json                 # Vercel Deployment Configuration
+VANTARA is powered by a highly sophisticated Python data generator that accurately models the grim realities of bureaucratic stagnation.
+
+```mermaid
+flowchart LR
+    A[Raw MoTA Demographic Data] --> B{Data Generator}
+    B -->|Synthesizes 12,000+ Claims| C[(In-Memory Dataset)]
+    C --> D{VANTARA Anomaly Engine}
+    
+    D -->|Rule 12 Violations| E[Statutory Delays]
+    D -->|> 10% Variance| F[Land Area Mismatches]
+    D -->|Missing Fields| G[Incomplete Records]
+    D -->|Peer-Corrected Math| H[Systemic Anomaly Scores]
+    
+    E & F & G & H --> I[FastAPI Endpoints]
 ```
 
----
+### Deep-Dive: Deterministic Anomaly Scoring
+The backend calculates a **Systemic Anomaly Score** for each district by:
+1. Finding a cohort of peer districts with similar tribal populations and forest coverage.
+2. Calculating the standard deviation of settlement rates among peers.
+3. Flagging districts that fall more than `2.0 σ` below their peer average.
+4. Categorizing bottlenecks into `INDIVIDUAL` (correctable) vs `SYSTEMIC` (requiring state intervention).
 
-## 📖 API Documentation
+<br/>
 
-The backend exposes a comprehensive RESTful API for querying FRA claims and generating metrics. 
-For a complete list of endpoints, see the [API Documentation](docs/API.md).
+## 🏗️ System Architecture
 
----
+VANTARA operates as a highly decoupled, serverless architecture deployed entirely on Vercel.
 
-## 🛠️ Local Setup & Development
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as React SPA (Frontend)
+    participant Edge as Vercel Edge Network
+    participant FastAPI as Vercel Serverless (Python)
+    participant Data as Data Engine (RAM)
+
+    Client->>Edge: Requests /api/dashboard/summary
+    Edge->>FastAPI: Routes request to api/index.py
+    
+    alt Cold Start (First Request)
+        FastAPI->>Data: Trigger load_or_generate_data()
+        Data-->>FastAPI: Generates 12,000 claims in RAM
+    end
+    
+    FastAPI->>Data: Query indexed data O(1)
+    Data-->>FastAPI: Return filtered JSON
+    FastAPI-->>Client: HTTP 200 OK (JSON Payload)
+```
+
+- **Why Vercel Serverless?** Zero-maintenance scaling. The backend scales instantly to zero when unused and scales up infinitely during traffic spikes, perfect for government portals.
+- **Why In-Memory Data?** Vercel Serverless Functions are read-only. Generating data entirely in-memory avoids costly I/O operations and bypasses AWS Lambda's `Read-Only File System` restrictions, ensuring 100% uptime.
+
+<br/>
+
+## 🛠️ Local Development Setup
 
 ### Prerequisites
 - Node.js (v18+)
@@ -100,7 +131,8 @@ For a complete list of endpoints, see the [API Documentation](docs/API.md).
 
 ### 1. Start the Backend (FastAPI)
 ```bash
-cd api
+git clone https://github.com/aaditya8979/Vantara.git
+cd Vantara/api
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -113,31 +145,47 @@ uvicorn index:app --reload --port 8000
 ### 2. Start the Frontend (React/Vite)
 Open a new terminal window:
 ```bash
-cd frontend
+cd Vantara/frontend
 npm install
 npm run dev
 ```
 *The frontend will run on `http://localhost:5173`*
 
----
+<br/>
 
-## 🔐 Environment Variables
+## 📁 Repository Structure
 
-| Variable | Location | Description | Required |
-|----------|----------|-------------|----------|
-| `VITE_API_BASE` | `frontend/.env` | Override API base URL (e.g., `http://localhost:8000/api`) | No (defaults to `/api`) |
+```
+├── api/                        # FastAPI serverless backend (Vercel)
+│   ├── index.py                # Main API entry point & Routing
+│   ├── _anomaly_engine.py      # Deterministic anomaly detection logic
+│   ├── _data_generator.py      # Synthetic data generation logic
+│   └── requirements.txt        # Python dependencies
+├── frontend/                   # React + Vite + TypeScript frontend
+│   ├── src/
+│   │   ├── components/         # React components (Dashboards, Maps, Tables)
+│   │   ├── api.ts              # Centralized API fetch client with JSDoc
+│   │   ├── types.ts            # Shared TypeScript interfaces
+│   │   ├── App.tsx             # Routing configuration
+│   │   └── main.tsx            # React DOM entry point
+│   └── package.json            # Node.js dependencies
+├── docs/                       # Comprehensive System Documentation
+├── .github/workflows/          # CI/CD Pipelines for Linting & Build
+└── vercel.json                 # Vercel Deployment Configuration
+```
 
----
+<br/>
 
-## 🤝 Contributing
+## 🤝 Community & Support
 
-We welcome contributions! Please review our:
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security Policy](SECURITY.md)
+We welcome contributions from developers, designers, and policy experts.
+- Read our [Contributing Guidelines](CONTRIBUTING.md)
+- Review our [Code of Conduct](CODE_OF_CONDUCT.md)
+- Report vulnerabilities via our [Security Policy](SECURITY.md)
 
----
+<br/>
 
-## 📄 License
-
-VANTARA is open-source software licensed under the [MIT License](LICENSE).
+<div align="center">
+  <sub>Built with ❤️ for the Adivasi Rights Administration Hackathon</sub><br/>
+  <sup>Licensed under the <a href="LICENSE">MIT License</a></sup>
+</div>
