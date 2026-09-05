@@ -279,7 +279,9 @@ export default function Landing({ onRoleSelect }: LandingProps) {
       <header style={{ background: "white", borderBottom: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#e8edf5", border: "2px solid #1e3a5f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, flexShrink: 0 }}></div>
+            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#e8edf5", border: "2px solid #1e3a5f", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+              <img src="/emblem.svg" alt="State Emblem of India" style={{ width: "80%", height: "80%", objectFit: "contain" }} />
+            </div>
             <div>
               <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>जनजातीय कार्य मंत्रालय</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#1e3a5f", lineHeight: 1.1 }}>{t("MINISTRY OF TRIBAL AFFAIRS", isHindi)}</div>
